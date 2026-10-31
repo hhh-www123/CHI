@@ -1,0 +1,71 @@
+{
+  "passed": true,
+  "scope": "Phase 1 inherited regression",
+  "phase": "Phase 3",
+  "version": "0.6.4-scoped-editor",
+  "baseURL": "http://127.0.0.1:8013",
+  "generationMode": "mock",
+  "realModel": false,
+  "realMap": false,
+  "databaseIsolation": ".runtime/phase1-browser/travel.sqlite3",
+  "browserErrors": [],
+  "results": [
+    {
+      "name": "Explicit fixed three-day demo opens trusted original cards, without model generation",
+      "passed": true
+    },
+    {
+      "name": "Edit mode supports keyboard selection and preserves existing interactive inputs",
+      "passed": true
+    },
+    {
+      "name": "Day 1 and day 3 locks persist; day 2 afternoon has a server-derived field whitelist and highlight",
+      "passed": true
+    },
+    {
+      "name": "Fixed Patch preview leaves GET and SQLite unchanged; explicit apply changes only the selected description",
+      "passed": true
+    },
+    {
+      "name": "Mixed authorized and unauthorized Patch is rejected atomically; protected days remain byte-identical",
+      "passed": true
+    },
+    {
+      "name": "Period and activity locks have visible UI state, disable matching controls, and reject malicious writes",
+      "passed": true
+    },
+    {
+      "name": "Authorized time Patch applies; invalid time ordering is rejected without changing formal state",
+      "passed": true
+    },
+    {
+      "name": "Existing note saving, real catalog alternatives, and trusted cards/timeline controls remain usable",
+      "passed": true
+    },
+    {
+      "name": "Original map/transport sections and safe place links render; no-key route state is explicitly unconfigured",
+      "passed": true
+    },
+    {
+      "name": "Undo and refresh/continue preserve stable IDs, data and persisted locks; ephemeral selection resets",
+      "passed": true
+    },
+    {
+      "name": "Stored untrusted HTML/JavaScript fixture stays inert and falls back to original trusted cards",
+      "passed": true
+    },
+    {
+      "name": "Desktop panes scroll independently; 390px mobile retains editor controls without horizontal overflow",
+      "passed": true
+    }
+  ],
+  "screenshots": [
+    "edit-scope-p1-desktop.png",
+    "edit-scope-p1-preview.png",
+    "edit-scope-p1-mobile.png"
+  ],
+  "fixtures": [
+    "fresh per-run browser context and sessions",
+    "legacy surface seeded only in isolated SQLite test session"
+  ]
+}

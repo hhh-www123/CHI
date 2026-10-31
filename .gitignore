@@ -1,0 +1,36 @@
+# Local dependencies and generated frontend
+node_modules/
+.venv/
+dist/
+
+# Local configuration and saved trips
+.env
+.env.*
+!.env.example
+.runtime/
+backend/.runtime/
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
+
+# Python, build and test caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+.vite/
+.vite-temp/
+*.tsbuildinfo
+.coverage
+.coverage.*
+coverage/
+htmlcov/
+tests/artifacts/
+.sites-runtime/
+
+# Local logs and OS metadata
+*.log
+.DS_Store
+Thumbs.db

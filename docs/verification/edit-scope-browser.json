@@ -1,0 +1,187 @@
+{
+  "passed": true,
+  "version": "0.6.4-scoped-editor",
+  "serverRevision": "bdc68f8de31d8bc4c9e13920140109eb38d599f20e9b09afed5712ddcd3c4a66",
+  "runId": "6ea56244-4558-4ce4-b183-9a97ddd08541",
+  "tripId": "bc183306958849b28352d489d48f667d",
+  "baseURL": "http://127.0.0.1:8015",
+  "databaseIsolation": ".runtime/edit-scope-e2e-6ea56244-4558-4ce4-b183-9a97ddd08541",
+  "realModel": false,
+  "realMap": false,
+  "browserErrors": [],
+  "externalRequests": [],
+  "results": [
+    {
+      "name": "Unlocked first-day morning supports three real mock candidates; preview is isolated and only B is saved",
+      "passed": true
+    },
+    {
+      "name": "Valid time changes cross periods with stable IDs; moving into a locked target period is rejected",
+      "passed": true
+    },
+    {
+      "name": "Generalized dates preserve exact selected scope and reject direct writes to derived metadata",
+      "passed": true
+    },
+    {
+      "name": "Third-day evening supports genuine candidate edits without changing other days",
+      "passed": true
+    },
+    {
+      "name": "Manual Patch replaces a real catalog place; its title is server-derived and stable IDs are preserved",
+      "passed": true
+    },
+    {
+      "name": "Natural-language place replacement produces three distinct real POIs; candidate B alone enters persistent history",
+      "passed": true
+    },
+    {
+      "name": "Unknown POIs, object locks and stale versions remain enforced; reload preserves generalized edits and constraints",
+      "passed": true
+    },
+    {
+      "name": "Original map fallback, navigation and persistent history remain usable on desktop and mobile",
+      "passed": true
+    }
+  ],
+  "changes": [
+    {
+      "name": "First-day morning mock B",
+      "baseVersion": 1,
+      "version": 2,
+      "allowedBusinessPaths": [
+        "/days/day1/stops/byId/day1-stop-1/startTime"
+      ],
+      "actualBusinessDiff": [
+        "/days/day1/stops/byId/day1-stop-1/startTime"
+      ]
+    },
+    {
+      "name": "First morning activity moved into afternoon",
+      "baseVersion": 4,
+      "version": 5,
+      "allowedBusinessPaths": [
+        "/days/day1/stops/byId/day1-stop-1/startTime"
+      ],
+      "actualBusinessDiff": [
+        "/days/day1/stops/byId/day1-stop-1/startTime"
+      ]
+    },
+    {
+      "name": "Third-day activity moved into evening",
+      "baseVersion": 5,
+      "version": 6,
+      "allowedBusinessPaths": [
+        "/days/day3/stops/byId/day3-stop-3/startTime"
+      ],
+      "actualBusinessDiff": [
+        "/days/day3/stops/byId/day3-stop-3/startTime"
+      ]
+    },
+    {
+      "name": "Third-day evening mock C",
+      "baseVersion": 6,
+      "version": 7,
+      "allowedBusinessPaths": [
+        "/days/day3/stops/byId/day3-stop-3/startTime",
+        "/days/day3/stops/byId/day3-stop-3/description"
+      ],
+      "actualBusinessDiff": [
+        "/days/day3/stops/byId/day3-stop-3/description",
+        "/days/day3/stops/byId/day3-stop-3/startTime"
+      ]
+    },
+    {
+      "name": "Real catalog replacement",
+      "baseVersion": 7,
+      "version": 8,
+      "allowedBusinessPaths": [
+        "/days/day2/stops/byId/day2-stop-1/placeId"
+      ],
+      "actualBusinessDiff": [
+        "/days/day2/stops/byId/day2-stop-1/placeId"
+      ]
+    },
+    {
+      "name": "Only real-place candidate B committed",
+      "baseVersion": 8,
+      "version": 9,
+      "allowedBusinessPaths": [
+        "/days/day2/stops/byId/day2-stop-1/placeId"
+      ],
+      "actualBusinessDiff": [
+        "/days/day2/stops/byId/day2-stop-1/placeId"
+      ]
+    }
+  ],
+  "rejections": [
+    {
+      "name": "Other day is outside the selected activity even when unlocked",
+      "status": 403,
+      "version": 5,
+      "unchanged": true,
+      "response": {
+        "code": "PATCH_OUT_OF_SCOPE",
+        "message": "补丁超出服务端允许的叶子字段范围。"
+      }
+    },
+    {
+      "name": "Derived metadata cannot be patched directly",
+      "status": 403,
+      "version": 5,
+      "unchanged": true,
+      "response": {
+        "code": "PATCH_OUT_OF_SCOPE",
+        "message": "补丁超出服务端允许的叶子字段范围。"
+      }
+    },
+    {
+      "name": "A direct title patch cannot impersonate a server-derived place title",
+      "status": 403,
+      "version": 9,
+      "unchanged": true,
+      "response": {
+        "code": "PATCH_OUT_OF_SCOPE",
+        "message": "补丁超出服务端允许的叶子字段范围。"
+      }
+    },
+    {
+      "name": "Unknown POI is rejected",
+      "status": 400,
+      "version": 9,
+      "unchanged": true,
+      "response": {
+        "code": "SCHEMA_INVALID",
+        "message": "请选择当前行程真实地点目录中的景点，不能使用虚构地点ID。"
+      }
+    },
+    {
+      "name": "Locked real place cannot be replaced",
+      "status": 423,
+      "version": 10,
+      "unchanged": true,
+      "response": {
+        "code": "LOCKED_COMPONENT",
+        "message": "当前选中组件或其父级已锁定。"
+      }
+    },
+    {
+      "name": "Old version cannot override generalized edits",
+      "status": 409,
+      "version": 10,
+      "unchanged": true,
+      "response": {
+        "code": "VERSION_CONFLICT",
+        "message": "候选/操作基于 v8，当前行程已是 v10；未覆盖当前版本，请重新生成。",
+        "expectedVersion": 8,
+        "currentVersion": 10
+      }
+    }
+  ],
+  "screenshots": [
+    "docs/screenshots/edit-scope/first-morning-candidates.png",
+    "docs/screenshots/edit-scope/third-evening-candidates.png",
+    "docs/screenshots/edit-scope/real-place-candidates.png",
+    "docs/screenshots/edit-scope/mobile-history.png"
+  ]
+}

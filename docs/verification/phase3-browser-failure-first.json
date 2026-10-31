@@ -1,0 +1,872 @@
+{
+  "passed": false,
+  "runId": "6b0f73b7-78c7-4976-a0cc-473a018280f2",
+  "tripId": "958716678fae4e319a0fbcf2c3d107ef",
+  "rounds": [
+    {
+      "round": 1,
+      "name": "第二天下午最小改动",
+      "input": "安排轻松一些",
+      "selectedComponentIds": [
+        "period-day-b788e8f66b45569789804db98ec29c73-pm"
+      ],
+      "baseVersion": 4,
+      "version": 5,
+      "allowedPaths": [
+        "/entities/activities/activity-007ef2c7f8dd525dad7de2f00f14291d/description",
+        "/entities/activities/activity-007ef2c7f8dd525dad7de2f00f14291d/startTime",
+        "/entities/activities/activity-07ba91da40da5a69b2b14cd6ce458826/description",
+        "/entities/activities/activity-07ba91da40da5a69b2b14cd6ce458826/startTime"
+      ],
+      "actualLeafDiff": [
+        "/entities/activities/activity-07ba91da40da5a69b2b14cd6ce458826/description"
+      ],
+      "legacyBusinessDiff": [
+        "/days/day2/stops/byId/day2-stop-2/description"
+      ],
+      "authorizedLegacyPaths": [
+        "/days/day2/stops/byId/day2-stop-3/description",
+        "/days/day2/stops/byId/day2-stop-3/startTime",
+        "/days/day2/stops/byId/day2-stop-2/description",
+        "/days/day2/stops/byId/day2-stop-2/startTime"
+      ],
+      "unauthorizedLegacyPaths": [],
+      "directUnauthorizedPaths": [],
+      "constraintsPreserved": true,
+      "constraintsSnapshot": {
+        "lockedComponentIds": [
+          "card-day-55ec9350eb065384b28d516f881932fc",
+          "card-day-996b0e5ae7e456158b1b4609b1c007d6"
+        ],
+        "hardConstraints": [
+          {
+            "id": "time-order",
+            "kind": "time_order",
+            "active": true
+          },
+          {
+            "id": "max-budget",
+            "kind": "max_budget",
+            "active": true,
+            "value": 3000
+          }
+        ]
+      },
+      "serverAllowedPaths": [
+        "/entities/activities/activity-007ef2c7f8dd525dad7de2f00f14291d/description",
+        "/entities/activities/activity-007ef2c7f8dd525dad7de2f00f14291d/startTime",
+        "/entities/activities/activity-07ba91da40da5a69b2b14cd6ce458826/description",
+        "/entities/activities/activity-07ba91da40da5a69b2b14cd6ce458826/startTime"
+      ],
+      "serverPayloadChangedPaths": [
+        "/tripState/days/day2/stops/1/description"
+      ],
+      "serverDocumentChangedPaths": [
+        "/entities/activities/activity-07ba91da40da5a69b2b14cd6ce458826/description"
+      ],
+      "pathNamespaces": {
+        "allowedPaths": "TripDocument",
+        "changedPaths": "TripDocument",
+        "payloadChangedPaths": "payloadSnapshot",
+        "documentChangedPaths": "TripDocument"
+      },
+      "historyRecord": {
+        "tripId": "958716678fae4e319a0fbcf2c3d107ef",
+        "version": 5,
+        "parentVersion": 4,
+        "baseVersion": 4,
+        "candidateId": "p2-d3858a71fa4d46a0a27a6d6d86be365e",
+        "patch": [
+          {
+            "op": "replace",
+            "path": "/entities/activities/activity-07ba91da40da5a69b2b14cd6ce458826/description",
+            "value": "沿竹林步道游览，出发前确认开放与入园安排。 在云栖竹径按体力缩短游览，预留20分钟休息；不增加景点。"
+          }
+        ],
+        "changedPaths": [
+          "/entities/activities/activity-07ba91da40da5a69b2b14cd6ce458826/description"
+        ],
+        "validationReport": {
+          "valid": true,
+          "schema": true,
+          "scope": true,
+          "locks": true,
+          "invariants": true,
+          "leafDiff": true,
+          "legacyBusinessDiff": true
+        }
+      },
+      "visualLabel": "round-01"
+    },
+    {
+      "round": 2,
+      "name": "明确全局授权：隐藏预算明细",
+      "input": "隐藏全局预算展示明细（明确确认）",
+      "selectedComponentIds": [],
+      "baseVersion": 5,
+      "version": 6,
+      "allowedPaths": [
+        "/presentationSettings/showBudgetDetails"
+      ],
+      "actualLeafDiff": [
+        "/presentationSettings/showBudgetDetails"
+      ],
+      "legacyBusinessDiff": [],
+      "authorizedLegacyPaths": [],
+      "unauthorizedLegacyPaths": [],
+      "directUnauthorizedPaths": [],
+      "constraintsPreserved": true,
+      "constraintsSnapshot": {
+        "lockedComponentIds": [
+          "card-day-55ec9350eb065384b28d516f881932fc",
+          "card-day-996b0e5ae7e456158b1b4609b1c007d6"
+        ],
+        "hardConstraints": [
+          {
+            "id": "time-order",
+            "kind": "time_order",
+            "active": true
+          },
+          {
+            "id": "max-budget",
+            "kind": "max_budget",
+            "active": true,
+            "value": 3000
+          }
+        ]
+      },
+      "serverAllowedPaths": [
+        "/presentationSettings/showBudgetDetails"
+      ],
+      "serverPayloadChangedPaths": [
+        "/presentationSettings/showBudgetDetails"
+      ],
+      "serverDocumentChangedPaths": [],
+      "pathNamespaces": {
+        "allowedPaths": "payloadSnapshot",
+        "changedPaths": "payloadSnapshot",
+        "payloadChangedPaths": "payloadSnapshot",
+        "documentChangedPaths": "TripDocument"
+      },
+      "historyRecord": {
+        "tripId": "958716678fae4e319a0fbcf2c3d107ef",
+        "version": 6,
+        "parentVersion": 5,
+        "baseVersion": 5,
+        "candidateId": null,
+        "patch": [],
+        "changedPaths": [
+          "/presentationSettings/showBudgetDetails"
+        ],
+        "validationReport": {
+          "valid": true,
+          "source": "trusted_user_action",
+          "invariants": true
+        }
+      },
+      "visualLabel": "round-02"
+    },
+    {
+      "round": 3,
+      "name": "第二天卡片精简样式",
+      "input": "明确选择第二天整天后精简共享卡片",
+      "selectedComponentIds": [
+        "card-day-b788e8f66b45569789804db98ec29c73"
+      ],
+      "baseVersion": 6,
+      "version": 7,
+      "allowedPaths": [
+        "/uiSpec/regions/day-2/compact"
+      ],
+      "actualLeafDiff": [
+        "/uiSpec/regions/day-2/compact"
+      ],
+      "legacyBusinessDiff": [],
+      "authorizedLegacyPaths": [],
+      "unauthorizedLegacyPaths": [],
+      "directUnauthorizedPaths": [],
+      "constraintsPreserved": true,
+      "constraintsSnapshot": {
+        "lockedComponentIds": [
+          "card-day-55ec9350eb065384b28d516f881932fc",
+          "card-day-996b0e5ae7e456158b1b4609b1c007d6"
+        ],
+        "hardConstraints": [
+          {
+            "id": "time-order",
+            "kind": "time_order",
+            "active": true
+          },
+          {
+            "id": "max-budget",
+            "kind": "max_budget",
+            "active": true,
+            "value": 3000
+          }
+        ]
+      },
+      "serverAllowedPaths": [
+        "/uiSpec/regions/day-2/compact"
+      ],
+      "serverPayloadChangedPaths": [
+        "/uiSpec/regions/day-2/compact"
+      ],
+      "serverDocumentChangedPaths": [],
+      "pathNamespaces": {
+        "allowedPaths": "payloadSnapshot",
+        "changedPaths": "payloadSnapshot",
+        "payloadChangedPaths": "payloadSnapshot",
+        "documentChangedPaths": "TripDocument"
+      },
+      "historyRecord": {
+        "tripId": "958716678fae4e319a0fbcf2c3d107ef",
+        "version": 7,
+        "parentVersion": 6,
+        "baseVersion": 6,
+        "candidateId": null,
+        "patch": [],
+        "changedPaths": [
+          "/uiSpec/regions/day-2/compact"
+        ],
+        "validationReport": {
+          "valid": true,
+          "source": "trusted_user_action",
+          "invariants": true
+        }
+      },
+      "visualLabel": "round-03"
+    },
+    {
+      "round": 4,
+      "name": "调整第二天下午开始时间",
+      "input": "将选中下午活动开始时间设为14:00",
+      "selectedComponentIds": [
+        "period-day-b788e8f66b45569789804db98ec29c73-pm"
+      ],
+      "baseVersion": 7,
+      "version": 8,
+      "allowedPaths": [
+        "/entities/activities/activity-07ba91da40da5a69b2b14cd6ce458826/startTime"
+      ],
+      "actualLeafDiff": [
+        "/entities/activities/activity-07ba91da40da5a69b2b14cd6ce458826/startTime"
+      ],
+      "legacyBusinessDiff": [
+        "/days/day2/stops/byId/day2-stop-2/startTime"
+      ],
+      "authorizedLegacyPaths": [
+        "/days/day2/stops/byId/day2-stop-2/startTime"
+      ],
+      "unauthorizedLegacyPaths": [],
+      "directUnauthorizedPaths": [],
+      "constraintsPreserved": true,
+      "constraintsSnapshot": {
+        "lockedComponentIds": [
+          "card-day-55ec9350eb065384b28d516f881932fc",
+          "card-day-996b0e5ae7e456158b1b4609b1c007d6"
+        ],
+        "hardConstraints": [
+          {
+            "id": "time-order",
+            "kind": "time_order",
+            "active": true
+          },
+          {
+            "id": "max-budget",
+            "kind": "max_budget",
+            "active": true,
+            "value": 3000
+          }
+        ]
+      },
+      "serverAllowedPaths": [
+        "/entities/activities/activity-007ef2c7f8dd525dad7de2f00f14291d/startTime",
+        "/entities/activities/activity-07ba91da40da5a69b2b14cd6ce458826/startTime"
+      ],
+      "serverPayloadChangedPaths": [
+        "/tripState/days/day2/stops/1/startTime"
+      ],
+      "serverDocumentChangedPaths": [
+        "/entities/activities/activity-07ba91da40da5a69b2b14cd6ce458826/startTime"
+      ],
+      "pathNamespaces": {
+        "allowedPaths": "TripDocument",
+        "changedPaths": "TripDocument",
+        "payloadChangedPaths": "payloadSnapshot",
+        "documentChangedPaths": "TripDocument"
+      },
+      "historyRecord": {
+        "tripId": "958716678fae4e319a0fbcf2c3d107ef",
+        "version": 8,
+        "parentVersion": 7,
+        "baseVersion": 7,
+        "candidateId": null,
+        "patch": [
+          {
+            "op": "replace",
+            "path": "/entities/activities/activity-07ba91da40da5a69b2b14cd6ce458826/startTime",
+            "value": "14:00"
+          }
+        ],
+        "changedPaths": [
+          "/entities/activities/activity-07ba91da40da5a69b2b14cd6ce458826/startTime"
+        ],
+        "validationReport": {
+          "valid": true,
+          "schema": true,
+          "scope": true,
+          "locks": true,
+          "invariants": true,
+          "leafDiff": true,
+          "legacyBusinessDiff": true
+        }
+      },
+      "visualLabel": "round-04"
+    },
+    {
+      "round": 5,
+      "name": "恢复第二天完整卡片样式",
+      "input": "明确选择第二天整天后展开卡片内容",
+      "selectedComponentIds": [
+        "card-day-b788e8f66b45569789804db98ec29c73"
+      ],
+      "baseVersion": 8,
+      "version": 9,
+      "allowedPaths": [
+        "/uiSpec/regions/day-2/compact"
+      ],
+      "actualLeafDiff": [
+        "/uiSpec/regions/day-2/compact"
+      ],
+      "legacyBusinessDiff": [],
+      "authorizedLegacyPaths": [],
+      "unauthorizedLegacyPaths": [],
+      "directUnauthorizedPaths": [],
+      "constraintsPreserved": true,
+      "constraintsSnapshot": {
+        "lockedComponentIds": [
+          "card-day-55ec9350eb065384b28d516f881932fc",
+          "card-day-996b0e5ae7e456158b1b4609b1c007d6"
+        ],
+        "hardConstraints": [
+          {
+            "id": "time-order",
+            "kind": "time_order",
+            "active": true
+          },
+          {
+            "id": "max-budget",
+            "kind": "max_budget",
+            "active": true,
+            "value": 3000
+          }
+        ]
+      },
+      "serverAllowedPaths": [
+        "/uiSpec/regions/day-2/compact"
+      ],
+      "serverPayloadChangedPaths": [
+        "/uiSpec/regions/day-2/compact"
+      ],
+      "serverDocumentChangedPaths": [],
+      "pathNamespaces": {
+        "allowedPaths": "payloadSnapshot",
+        "changedPaths": "payloadSnapshot",
+        "payloadChangedPaths": "payloadSnapshot",
+        "documentChangedPaths": "TripDocument"
+      },
+      "historyRecord": {
+        "tripId": "958716678fae4e319a0fbcf2c3d107ef",
+        "version": 9,
+        "parentVersion": 8,
+        "baseVersion": 8,
+        "candidateId": null,
+        "patch": [],
+        "changedPaths": [
+          "/uiSpec/regions/day-2/compact"
+        ],
+        "validationReport": {
+          "valid": true,
+          "source": "trusted_user_action",
+          "invariants": true
+        }
+      },
+      "visualLabel": "round-05"
+    }
+  ],
+  "rejections": [],
+  "visualComparisons": [
+    {
+      "label": "baseline",
+      "viewport": {
+        "width": 1600,
+        "height": 1100,
+        "deviceScaleFactor": 1
+      },
+      "activeDay2Geometry": {
+        ".hotel-card": {
+          "x": 2,
+          "contentY": 1555.296875,
+          "width": 452.5,
+          "height": 301.78125
+        },
+        ".budget-card": {
+          "x": 471.5,
+          "contentY": 1555.296875,
+          "width": 452.5,
+          "height": 301.78125
+        },
+        ".day-panel": {
+          "x": 2,
+          "contentY": 285,
+          "width": 922,
+          "height": 1250.296875
+        }
+      },
+      "geometryChangedFromPrevious": [],
+      "protectedCropComparisonsToPrevious": {},
+      "images": {
+        "day1": "docs/screenshots/phase3/baseline-day1.png",
+        "day3": "docs/screenshots/phase3/baseline-day3.png",
+        "hotel": "docs/screenshots/phase3/baseline-hotel.png"
+      }
+    },
+    {
+      "label": "round-01",
+      "viewport": {
+        "width": 1600,
+        "height": 1100,
+        "deviceScaleFactor": 1
+      },
+      "activeDay2Geometry": {
+        ".hotel-card": {
+          "x": 2,
+          "contentY": 1555.296875,
+          "width": 452.5,
+          "height": 301.78125
+        },
+        ".budget-card": {
+          "x": 471.5,
+          "contentY": 1555.296875,
+          "width": 452.5,
+          "height": 301.78125
+        },
+        ".day-panel": {
+          "x": 2,
+          "contentY": 285,
+          "width": 922,
+          "height": 1250.296875
+        }
+      },
+      "geometryChangedFromPrevious": [],
+      "protectedCropComparisonsToPrevious": {
+        "day1": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "day3": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "hotel": {
+          "sameDimensions": true,
+          "beforeSize": [
+            453,
+            303
+          ],
+          "afterSize": [
+            453,
+            303
+          ],
+          "differentPixels": 0,
+          "totalPixels": 137259,
+          "fraction": 0,
+          "boundingBox": null
+        }
+      },
+      "images": {
+        "day1": "docs/screenshots/phase3/round-01-day1.png",
+        "day3": "docs/screenshots/phase3/round-01-day3.png",
+        "hotel": "docs/screenshots/phase3/round-01-hotel.png"
+      }
+    },
+    {
+      "label": "round-02",
+      "viewport": {
+        "width": 1600,
+        "height": 1100,
+        "deviceScaleFactor": 1
+      },
+      "activeDay2Geometry": {
+        ".hotel-card": {
+          "x": 2,
+          "contentY": 1555.296875,
+          "width": 452.5,
+          "height": 301.78125
+        },
+        ".budget-card": {
+          "x": 471.5,
+          "contentY": 1555.296875,
+          "width": 452.5,
+          "height": 301.78125
+        },
+        ".day-panel": {
+          "x": 2,
+          "contentY": 285,
+          "width": 922,
+          "height": 1250.296875
+        }
+      },
+      "geometryChangedFromPrevious": [],
+      "protectedCropComparisonsToPrevious": {
+        "day1": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "day3": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "hotel": {
+          "sameDimensions": true,
+          "beforeSize": [
+            453,
+            303
+          ],
+          "afterSize": [
+            453,
+            303
+          ],
+          "differentPixels": 0,
+          "totalPixels": 137259,
+          "fraction": 0,
+          "boundingBox": null
+        }
+      },
+      "images": {
+        "day1": "docs/screenshots/phase3/round-02-day1.png",
+        "day3": "docs/screenshots/phase3/round-02-day3.png",
+        "hotel": "docs/screenshots/phase3/round-02-hotel.png"
+      }
+    },
+    {
+      "label": "round-03",
+      "viewport": {
+        "width": 1600,
+        "height": 1100,
+        "deviceScaleFactor": 1
+      },
+      "activeDay2Geometry": {
+        ".hotel-card": {
+          "x": 2,
+          "contentY": 1419.734375,
+          "width": 452.5,
+          "height": 301.78125
+        },
+        ".budget-card": {
+          "x": 471.5,
+          "contentY": 1419.734375,
+          "width": 452.5,
+          "height": 301.78125
+        },
+        ".day-panel": {
+          "x": 2,
+          "contentY": 285,
+          "width": 922,
+          "height": 1114.734375
+        }
+      },
+      "geometryChangedFromPrevious": [
+        {
+          "path": "/.budget-card/contentY"
+        },
+        {
+          "path": "/.day-panel/height"
+        },
+        {
+          "path": "/.hotel-card/contentY"
+        }
+      ],
+      "protectedCropComparisonsToPrevious": {
+        "day1": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "day3": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "hotel": {
+          "sameDimensions": true,
+          "beforeSize": [
+            453,
+            303
+          ],
+          "afterSize": [
+            453,
+            303
+          ],
+          "differentPixels": 0,
+          "totalPixels": 137259,
+          "fraction": 0,
+          "boundingBox": null
+        }
+      },
+      "images": {
+        "day1": "docs/screenshots/phase3/round-03-day1.png",
+        "day3": "docs/screenshots/phase3/round-03-day3.png",
+        "hotel": "docs/screenshots/phase3/round-03-hotel.png"
+      }
+    },
+    {
+      "label": "round-04",
+      "viewport": {
+        "width": 1600,
+        "height": 1100,
+        "deviceScaleFactor": 1
+      },
+      "activeDay2Geometry": {
+        ".hotel-card": {
+          "x": 2,
+          "contentY": 1419.734375,
+          "width": 452.5,
+          "height": 301.78125
+        },
+        ".budget-card": {
+          "x": 471.5,
+          "contentY": 1419.734375,
+          "width": 452.5,
+          "height": 301.78125
+        },
+        ".day-panel": {
+          "x": 2,
+          "contentY": 285,
+          "width": 922,
+          "height": 1114.734375
+        }
+      },
+      "geometryChangedFromPrevious": [],
+      "protectedCropComparisonsToPrevious": {
+        "day1": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "day3": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "hotel": {
+          "sameDimensions": true,
+          "beforeSize": [
+            453,
+            303
+          ],
+          "afterSize": [
+            453,
+            303
+          ],
+          "differentPixels": 0,
+          "totalPixels": 137259,
+          "fraction": 0,
+          "boundingBox": null
+        }
+      },
+      "images": {
+        "day1": "docs/screenshots/phase3/round-04-day1.png",
+        "day3": "docs/screenshots/phase3/round-04-day3.png",
+        "hotel": "docs/screenshots/phase3/round-04-hotel.png"
+      }
+    },
+    {
+      "label": "round-05",
+      "viewport": {
+        "width": 1600,
+        "height": 1100,
+        "deviceScaleFactor": 1
+      },
+      "activeDay2Geometry": {
+        ".hotel-card": {
+          "x": 2,
+          "contentY": 1555.296875,
+          "width": 452.5,
+          "height": 301.78125
+        },
+        ".budget-card": {
+          "x": 471.5,
+          "contentY": 1555.296875,
+          "width": 452.5,
+          "height": 301.78125
+        },
+        ".day-panel": {
+          "x": 2,
+          "contentY": 285,
+          "width": 922,
+          "height": 1250.296875
+        }
+      },
+      "geometryChangedFromPrevious": [
+        {
+          "path": "/.budget-card/contentY"
+        },
+        {
+          "path": "/.day-panel/height"
+        },
+        {
+          "path": "/.hotel-card/contentY"
+        }
+      ],
+      "protectedCropComparisonsToPrevious": {
+        "day1": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "day3": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "hotel": {
+          "sameDimensions": true,
+          "beforeSize": [
+            453,
+            303
+          ],
+          "afterSize": [
+            453,
+            303
+          ],
+          "differentPixels": 0,
+          "totalPixels": 137259,
+          "fraction": 0,
+          "boundingBox": null
+        }
+      },
+      "images": {
+        "day1": "docs/screenshots/phase3/round-05-day1.png",
+        "day3": "docs/screenshots/phase3/round-05-day3.png",
+        "hotel": "docs/screenshots/phase3/round-05-hotel.png"
+      }
+    }
+  ],
+  "results": [
+    {
+      "name": "Explicit component locks and budget hard cap are versioned; baseline snapshot created",
+      "passed": true
+    },
+    {
+      "name": "Candidate switching and cancel preserve official Session and SQLite bytes",
+      "passed": true
+    }
+  ],
+  "browserErrors": [],
+  "error": "AssertionError [ERR_ASSERTION]: Protected day1 card pixels must stay identical in fixed browse view\n\n8 !== 0\n\n    at visualSample (D:\\集中教学\\智能人机交互\\travel-genui_1\\tests\\phase3-ui.cjs:57:224)\n    at async round (D:\\集中教学\\智能人机交互\\travel-genui_1\\tests\\phase3-ui.cjs:65:950)\n    at async D:\\集中教学\\智能人机交互\\travel-genui_1\\tests\\phase3-ui.cjs:79:87"
+}

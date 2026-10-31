@@ -1,0 +1,11 @@
+{
+  "passed": false,
+  "runId": "8d94c56e-d77c-45bd-b0ff-e7aac22b3b49",
+  "tripId": "0566d6f4e2574d859a9072d90ca5dad8",
+  "results": [],
+  "changes": [],
+  "rejections": [],
+  "browserErrors": [],
+  "externalRequests": [],
+  "error": "response.text: Protocol error (Network.getResponseBody): No data found for resource with given identifier\nResponse body is not available for a response that was navigated away from. Read response.body() before triggering any navigation.\n    at previewResponse (D:\\集中教学\\智能人机交互\\travel-genui_1\\tests\\preview-response.cjs:4:31)\n    at action (D:\\集中教学\\智能人机交互\\travel-genui_1\\tests\\edit-scope-ui.cjs:58:234)\n    at async generated (D:\\集中教学\\智能人机交互\\travel-genui_1\\tests\\edit-scope-ui.cjs:67:105)\n    at async D:\\集中教学\\智能人机交互\\travel-genui_1\\tests\\edit-scope-ui.cjs:92:17"
+}

@@ -1,0 +1,1272 @@
+{
+  "passed": true,
+  "runId": "4060181e-8f94-416d-a235-0a6e13b80cc0",
+  "tripId": "df45e8430d2b48008ffa0e02acf8297e",
+  "baselineVersion": 4,
+  "successfulMainRounds": 10,
+  "successfulConflictPreparationRounds": 1,
+  "totalSuccessfulRounds": 11,
+  "directUnauthorizedDocumentPathCount": 0,
+  "directUnauthorizedLegacyBusinessPathCount": 0,
+  "allConstraintsPreserved": true,
+  "restart": {
+    "beforePid": 25796,
+    "afterPid": 13456,
+    "actualRestart": true,
+    "versionsAndConstraintsEqual": true
+  },
+  "rounds": [
+    {
+      "round": 1,
+      "name": "第二天下午最小改动",
+      "input": "安排轻松一些",
+      "baseVersion": 4,
+      "version": 5,
+      "allowedPathCount": 4,
+      "actualLeafCount": 1,
+      "actualLeafDiff": [
+        "/entities/activities/activity-749f005a92fb57aba9d026c7097ac6d2/description"
+      ],
+      "legacyBusinessDiff": [
+        "/days/day2/stops/byId/day2-stop-2/description"
+      ],
+      "constraintsPreserved": true,
+      "unauthorizedDocumentPaths": [],
+      "unauthorizedLegacyPaths": []
+    },
+    {
+      "round": 2,
+      "name": "明确全局授权：隐藏预算明细",
+      "input": "隐藏全局预算展示明细（明确确认）",
+      "baseVersion": 5,
+      "version": 6,
+      "allowedPathCount": 1,
+      "actualLeafCount": 1,
+      "actualLeafDiff": [
+        "/presentationSettings/showBudgetDetails"
+      ],
+      "legacyBusinessDiff": [],
+      "constraintsPreserved": true,
+      "unauthorizedDocumentPaths": [],
+      "unauthorizedLegacyPaths": []
+    },
+    {
+      "round": 3,
+      "name": "第二天卡片精简样式",
+      "input": "明确选择第二天整天后精简共享卡片",
+      "baseVersion": 6,
+      "version": 7,
+      "allowedPathCount": 1,
+      "actualLeafCount": 1,
+      "actualLeafDiff": [
+        "/uiSpec/regions/day-2/compact"
+      ],
+      "legacyBusinessDiff": [],
+      "constraintsPreserved": true,
+      "unauthorizedDocumentPaths": [],
+      "unauthorizedLegacyPaths": []
+    },
+    {
+      "round": 4,
+      "name": "调整第二天下午开始时间",
+      "input": "将选中下午活动开始时间设为14:00",
+      "baseVersion": 7,
+      "version": 8,
+      "allowedPathCount": 1,
+      "actualLeafCount": 1,
+      "actualLeafDiff": [
+        "/entities/activities/activity-749f005a92fb57aba9d026c7097ac6d2/startTime"
+      ],
+      "legacyBusinessDiff": [
+        "/days/day2/stops/byId/day2-stop-2/startTime"
+      ],
+      "constraintsPreserved": true,
+      "unauthorizedDocumentPaths": [],
+      "unauthorizedLegacyPaths": []
+    },
+    {
+      "round": 5,
+      "name": "恢复第二天完整卡片样式",
+      "input": "明确选择第二天整天后展开卡片内容",
+      "baseVersion": 8,
+      "version": 9,
+      "allowedPathCount": 1,
+      "actualLeafCount": 1,
+      "actualLeafDiff": [
+        "/uiSpec/regions/day-2/compact"
+      ],
+      "legacyBusinessDiff": [],
+      "constraintsPreserved": true,
+      "unauthorizedDocumentPaths": [],
+      "unauthorizedLegacyPaths": []
+    },
+    {
+      "round": 6,
+      "name": "返回第二天下午采用体验方案",
+      "input": "安排轻松一些",
+      "baseVersion": 9,
+      "version": 10,
+      "allowedPathCount": 4,
+      "actualLeafCount": 3,
+      "actualLeafDiff": [
+        "/entities/activities/activity-3fc5637492cc5e4098f429373998af07/startTime",
+        "/entities/activities/activity-749f005a92fb57aba9d026c7097ac6d2/description",
+        "/entities/activities/activity-749f005a92fb57aba9d026c7097ac6d2/startTime"
+      ],
+      "legacyBusinessDiff": [
+        "/days/day2/stops/byId/day2-stop-2/description",
+        "/days/day2/stops/byId/day2-stop-2/startTime",
+        "/days/day2/stops/byId/day2-stop-3/startTime"
+      ],
+      "constraintsPreserved": true,
+      "unauthorizedDocumentPaths": [],
+      "unauthorizedLegacyPaths": []
+    },
+    {
+      "round": 7,
+      "name": "明确全局授权：显示预算明细",
+      "input": "恢复全局预算展示明细（明确确认）",
+      "baseVersion": 10,
+      "version": 11,
+      "allowedPathCount": 1,
+      "actualLeafCount": 1,
+      "actualLeafDiff": [
+        "/presentationSettings/showBudgetDetails"
+      ],
+      "legacyBusinessDiff": [],
+      "constraintsPreserved": true,
+      "unauthorizedDocumentPaths": [],
+      "unauthorizedLegacyPaths": []
+    },
+    {
+      "round": 8,
+      "name": "第二天局部时间轴",
+      "input": "明确选择第二天整天切换可信时间轴",
+      "baseVersion": 11,
+      "version": 12,
+      "allowedPathCount": 1,
+      "actualLeafCount": 1,
+      "actualLeafDiff": [
+        "/uiSpec/regions/day-2/view"
+      ],
+      "legacyBusinessDiff": [],
+      "constraintsPreserved": true,
+      "unauthorizedDocumentPaths": [],
+      "unauthorizedLegacyPaths": []
+    },
+    {
+      "round": 9,
+      "name": "明确恢复历史快照并新建版本",
+      "input": "恢复v5数据、展示、锁和硬约束（明确确认）",
+      "baseVersion": 12,
+      "version": 13,
+      "allowedPathCount": 4,
+      "actualLeafCount": 4,
+      "actualLeafDiff": [
+        "/entities/activities/activity-3fc5637492cc5e4098f429373998af07/startTime",
+        "/entities/activities/activity-749f005a92fb57aba9d026c7097ac6d2/description",
+        "/entities/activities/activity-749f005a92fb57aba9d026c7097ac6d2/startTime",
+        "/uiSpec/regions/day-2/view"
+      ],
+      "legacyBusinessDiff": [
+        "/days/day2/stops/byId/day2-stop-2/description",
+        "/days/day2/stops/byId/day2-stop-2/startTime",
+        "/days/day2/stops/byId/day2-stop-3/startTime"
+      ],
+      "constraintsPreserved": true,
+      "unauthorizedDocumentPaths": [],
+      "unauthorizedLegacyPaths": []
+    },
+    {
+      "round": 10,
+      "name": "撤销刚才恢复并保留审计链",
+      "input": "撤销上一步，恢复其父版本数据及约束",
+      "baseVersion": 13,
+      "version": 14,
+      "allowedPathCount": 4,
+      "actualLeafCount": 4,
+      "actualLeafDiff": [
+        "/entities/activities/activity-3fc5637492cc5e4098f429373998af07/startTime",
+        "/entities/activities/activity-749f005a92fb57aba9d026c7097ac6d2/description",
+        "/entities/activities/activity-749f005a92fb57aba9d026c7097ac6d2/startTime",
+        "/uiSpec/regions/day-2/view"
+      ],
+      "legacyBusinessDiff": [
+        "/days/day2/stops/byId/day2-stop-2/description",
+        "/days/day2/stops/byId/day2-stop-2/startTime",
+        "/days/day2/stops/byId/day2-stop-3/startTime"
+      ],
+      "constraintsPreserved": true,
+      "unauthorizedDocumentPaths": [],
+      "unauthorizedLegacyPaths": []
+    },
+    {
+      "round": 11,
+      "name": "另一客户端明确修改第二天样式以形成冲突",
+      "input": "另一客户端明确选择第二天并精简卡片",
+      "baseVersion": 14,
+      "version": 15,
+      "allowedPathCount": 1,
+      "actualLeafCount": 1,
+      "actualLeafDiff": [
+        "/uiSpec/regions/day-2/compact"
+      ],
+      "legacyBusinessDiff": [],
+      "constraintsPreserved": true,
+      "unauthorizedDocumentPaths": [],
+      "unauthorizedLegacyPaths": []
+    }
+  ],
+  "visualSamples": [
+    {
+      "label": "baseline",
+      "geometryDeltas": [],
+      "cropMetrics": {},
+      "images": {
+        "day1": "docs/screenshots/phase3/baseline-day1.png",
+        "day3": "docs/screenshots/phase3/baseline-day3.png",
+        "hotel": "docs/screenshots/phase3/baseline-hotel.png"
+      }
+    },
+    {
+      "label": "round-01",
+      "geometryDeltas": [],
+      "cropMetrics": {
+        "day1": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "day3": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "hotel": {
+          "sameDimensions": true,
+          "beforeSize": [
+            453,
+            303
+          ],
+          "afterSize": [
+            453,
+            303
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 137259,
+          "fraction": 0,
+          "boundingBox": null
+        }
+      },
+      "images": {
+        "day1": "docs/screenshots/phase3/round-01-day1.png",
+        "day3": "docs/screenshots/phase3/round-01-day3.png",
+        "hotel": "docs/screenshots/phase3/round-01-hotel.png"
+      }
+    },
+    {
+      "label": "round-02",
+      "geometryDeltas": [],
+      "cropMetrics": {
+        "day1": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "day3": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "hotel": {
+          "sameDimensions": true,
+          "beforeSize": [
+            453,
+            303
+          ],
+          "afterSize": [
+            453,
+            303
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 137259,
+          "fraction": 0,
+          "boundingBox": null
+        }
+      },
+      "images": {
+        "day1": "docs/screenshots/phase3/round-02-day1.png",
+        "day3": "docs/screenshots/phase3/round-02-day3.png",
+        "hotel": "docs/screenshots/phase3/round-02-hotel.png"
+      }
+    },
+    {
+      "label": "round-03",
+      "geometryDeltas": [
+        {
+          "component": ".hotel-card",
+          "property": "contentY",
+          "before": 1555.296875,
+          "after": 1419.734375,
+          "delta": -135.5625
+        },
+        {
+          "component": ".budget-card",
+          "property": "contentY",
+          "before": 1555.296875,
+          "after": 1419.734375,
+          "delta": -135.5625
+        },
+        {
+          "component": ".day-panel",
+          "property": "height",
+          "before": 1250.296875,
+          "after": 1114.734375,
+          "delta": -135.5625
+        }
+      ],
+      "cropMetrics": {
+        "day1": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "day3": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "hotel": {
+          "sameDimensions": true,
+          "beforeSize": [
+            453,
+            303
+          ],
+          "afterSize": [
+            453,
+            303
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 137259,
+          "fraction": 0,
+          "boundingBox": null
+        }
+      },
+      "images": {
+        "day1": "docs/screenshots/phase3/round-03-day1.png",
+        "day3": "docs/screenshots/phase3/round-03-day3.png",
+        "hotel": "docs/screenshots/phase3/round-03-hotel.png"
+      }
+    },
+    {
+      "label": "round-04",
+      "geometryDeltas": [],
+      "cropMetrics": {
+        "day1": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "day3": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "hotel": {
+          "sameDimensions": true,
+          "beforeSize": [
+            453,
+            303
+          ],
+          "afterSize": [
+            453,
+            303
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 137259,
+          "fraction": 0,
+          "boundingBox": null
+        }
+      },
+      "images": {
+        "day1": "docs/screenshots/phase3/round-04-day1.png",
+        "day3": "docs/screenshots/phase3/round-04-day3.png",
+        "hotel": "docs/screenshots/phase3/round-04-hotel.png"
+      }
+    },
+    {
+      "label": "round-05",
+      "geometryDeltas": [
+        {
+          "component": ".hotel-card",
+          "property": "contentY",
+          "before": 1419.734375,
+          "after": 1555.296875,
+          "delta": 135.5625
+        },
+        {
+          "component": ".budget-card",
+          "property": "contentY",
+          "before": 1419.734375,
+          "after": 1555.296875,
+          "delta": 135.5625
+        },
+        {
+          "component": ".day-panel",
+          "property": "height",
+          "before": 1114.734375,
+          "after": 1250.296875,
+          "delta": 135.5625
+        }
+      ],
+      "cropMetrics": {
+        "day1": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "day3": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "hotel": {
+          "sameDimensions": true,
+          "beforeSize": [
+            453,
+            303
+          ],
+          "afterSize": [
+            453,
+            303
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 137259,
+          "fraction": 0,
+          "boundingBox": null
+        }
+      },
+      "images": {
+        "day1": "docs/screenshots/phase3/round-05-day1.png",
+        "day3": "docs/screenshots/phase3/round-05-day3.png",
+        "hotel": "docs/screenshots/phase3/round-05-hotel.png"
+      }
+    },
+    {
+      "label": "round-06",
+      "geometryDeltas": [
+        {
+          "component": ".hotel-card",
+          "property": "contentY",
+          "before": 1555.296875,
+          "after": 1577.484375,
+          "delta": 22.1875
+        },
+        {
+          "component": ".budget-card",
+          "property": "contentY",
+          "before": 1555.296875,
+          "after": 1577.484375,
+          "delta": 22.1875
+        },
+        {
+          "component": ".day-panel",
+          "property": "height",
+          "before": 1250.296875,
+          "after": 1272.484375,
+          "delta": 22.1875
+        }
+      ],
+      "cropMetrics": {
+        "day1": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "day3": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "hotel": {
+          "sameDimensions": true,
+          "beforeSize": [
+            453,
+            303
+          ],
+          "afterSize": [
+            453,
+            303
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 137259,
+          "fraction": 0,
+          "boundingBox": null
+        }
+      },
+      "images": {
+        "day1": "docs/screenshots/phase3/round-06-day1.png",
+        "day3": "docs/screenshots/phase3/round-06-day3.png",
+        "hotel": "docs/screenshots/phase3/round-06-hotel.png"
+      }
+    },
+    {
+      "label": "round-07",
+      "geometryDeltas": [],
+      "cropMetrics": {
+        "day1": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "day3": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "hotel": {
+          "sameDimensions": true,
+          "beforeSize": [
+            453,
+            303
+          ],
+          "afterSize": [
+            453,
+            303
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 137259,
+          "fraction": 0,
+          "boundingBox": null
+        }
+      },
+      "images": {
+        "day1": "docs/screenshots/phase3/round-07-day1.png",
+        "day3": "docs/screenshots/phase3/round-07-day3.png",
+        "hotel": "docs/screenshots/phase3/round-07-hotel.png"
+      }
+    },
+    {
+      "label": "round-08",
+      "geometryDeltas": [
+        {
+          "component": ".hotel-card",
+          "property": "contentY",
+          "before": 1577.484375,
+          "after": 1592.484375,
+          "delta": 15.0
+        },
+        {
+          "component": ".budget-card",
+          "property": "contentY",
+          "before": 1577.484375,
+          "after": 1592.484375,
+          "delta": 15.0
+        },
+        {
+          "component": ".day-panel",
+          "property": "height",
+          "before": 1272.484375,
+          "after": 1287.484375,
+          "delta": 15.0
+        }
+      ],
+      "cropMetrics": {
+        "day1": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "day3": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "hotel": {
+          "sameDimensions": true,
+          "beforeSize": [
+            453,
+            303
+          ],
+          "afterSize": [
+            453,
+            303
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 137259,
+          "fraction": 0,
+          "boundingBox": null
+        }
+      },
+      "images": {
+        "day1": "docs/screenshots/phase3/round-08-day1.png",
+        "day3": "docs/screenshots/phase3/round-08-day3.png",
+        "hotel": "docs/screenshots/phase3/round-08-hotel.png"
+      }
+    },
+    {
+      "label": "round-09",
+      "geometryDeltas": [
+        {
+          "component": ".hotel-card",
+          "property": "contentY",
+          "before": 1592.484375,
+          "after": 1555.296875,
+          "delta": -37.1875
+        },
+        {
+          "component": ".budget-card",
+          "property": "contentY",
+          "before": 1592.484375,
+          "after": 1555.296875,
+          "delta": -37.1875
+        },
+        {
+          "component": ".day-panel",
+          "property": "height",
+          "before": 1287.484375,
+          "after": 1250.296875,
+          "delta": -37.1875
+        }
+      ],
+      "cropMetrics": {
+        "day1": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "day3": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "hotel": {
+          "sameDimensions": true,
+          "beforeSize": [
+            453,
+            303
+          ],
+          "afterSize": [
+            453,
+            303
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 137259,
+          "fraction": 0,
+          "boundingBox": null
+        }
+      },
+      "images": {
+        "day1": "docs/screenshots/phase3/round-09-day1.png",
+        "day3": "docs/screenshots/phase3/round-09-day3.png",
+        "hotel": "docs/screenshots/phase3/round-09-hotel.png"
+      }
+    },
+    {
+      "label": "round-10",
+      "geometryDeltas": [
+        {
+          "component": ".hotel-card",
+          "property": "contentY",
+          "before": 1555.296875,
+          "after": 1592.484375,
+          "delta": 37.1875
+        },
+        {
+          "component": ".budget-card",
+          "property": "contentY",
+          "before": 1555.296875,
+          "after": 1592.484375,
+          "delta": 37.1875
+        },
+        {
+          "component": ".day-panel",
+          "property": "height",
+          "before": 1250.296875,
+          "after": 1287.484375,
+          "delta": 37.1875
+        }
+      ],
+      "cropMetrics": {
+        "day1": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "day3": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "hotel": {
+          "sameDimensions": true,
+          "beforeSize": [
+            453,
+            303
+          ],
+          "afterSize": [
+            453,
+            303
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 137259,
+          "fraction": 0,
+          "boundingBox": null
+        }
+      },
+      "images": {
+        "day1": "docs/screenshots/phase3/round-10-day1.png",
+        "day3": "docs/screenshots/phase3/round-10-day3.png",
+        "hotel": "docs/screenshots/phase3/round-10-hotel.png"
+      }
+    },
+    {
+      "label": "round-11",
+      "geometryDeltas": [
+        {
+          "component": ".hotel-card",
+          "property": "contentY",
+          "before": 1592.484375,
+          "after": 1479.734375,
+          "delta": -112.75
+        },
+        {
+          "component": ".budget-card",
+          "property": "contentY",
+          "before": 1592.484375,
+          "after": 1479.734375,
+          "delta": -112.75
+        },
+        {
+          "component": ".day-panel",
+          "property": "height",
+          "before": 1287.484375,
+          "after": 1174.734375,
+          "delta": -112.75
+        }
+      ],
+      "cropMetrics": {
+        "day1": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "day3": {
+          "sameDimensions": true,
+          "beforeSize": [
+            870,
+            278
+          ],
+          "afterSize": [
+            870,
+            278
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 241860,
+          "fraction": 0,
+          "boundingBox": null
+        },
+        "hotel": {
+          "sameDimensions": true,
+          "beforeSize": [
+            453,
+            303
+          ],
+          "afterSize": [
+            453,
+            303
+          ],
+          "differentPixels": 0,
+          "rawDifferentPixels": 0,
+          "rawFraction": 0,
+          "significantDifferentPixels": 0,
+          "channelTolerance": 2,
+          "rawFractionLimit": 0.0001,
+          "maxChannelDelta": 0,
+          "totalPixels": 137259,
+          "fraction": 0,
+          "boundingBox": null
+        }
+      },
+      "images": {
+        "day1": "docs/screenshots/phase3/round-11-day1.png",
+        "day3": "docs/screenshots/phase3/round-11-day3.png",
+        "hotel": "docs/screenshots/phase3/round-11-hotel.png"
+      }
+    }
+  ],
+  "rejections": [
+    {
+      "name": "Locked day display edit",
+      "status": 423,
+      "response": {
+        "code": "LOCKED_COMPONENT",
+        "message": "锁定范围‘第一天’或其共享展示发生修改，正式状态保持不变。"
+      },
+      "version": 12,
+      "unchanged": true
+    },
+    {
+      "name": "Old candidate cannot overwrite new version",
+      "status": 409,
+      "response": {
+        "code": "VERSION_CONFLICT",
+        "message": "候选/操作基于 v11，当前行程已是 v12；未覆盖当前版本，请重新生成。",
+        "expectedVersion": 11,
+        "currentVersion": 12
+      },
+      "version": 12,
+      "unchanged": true
+    },
+    {
+      "name": "Ordinary budget edit cannot break saved cap",
+      "status": 400,
+      "version": 12,
+      "unchanged": true
+    },
+    {
+      "name": "Visible candidate conflict identifies scope and both versions",
+      "status": 409,
+      "expectedVersion": 14,
+      "currentVersion": 15,
+      "selectedComponentIds": [
+        "period-day-d84f0aeee1a85438a6b2984eabb9442c-pm"
+      ],
+      "unchanged": true
+    },
+    {
+      "name": "Missing explicit global consent",
+      "status": 422,
+      "response": "请求格式不正确，请检查版本、目标区域和输入内容。",
+      "version": 15,
+      "unchanged": true
+    },
+    {
+      "name": "Restart invalidates preview but not versions",
+      "status": 410,
+      "response": {
+        "code": "CANDIDATE_EXPIRED",
+        "message": "候选不存在、已采用或已失效，请重新生成。"
+      },
+      "version": 15,
+      "unchanged": true
+    }
+  ],
+  "browserErrors": [],
+  "externalRequests": [],
+  "protectedCropComparisons": 22,
+  "protectedRawDifferentPixelsTotal": 0,
+  "protectedSignificantDifferentPixelsTotal": 0,
+  "protectedMaxChannelDelta": 0,
+  "roundsWithIndirectGeometryDrift": [
+    "round-03",
+    "round-05",
+    "round-06",
+    "round-08",
+    "round-09",
+    "round-10",
+    "round-11"
+  ]
+}

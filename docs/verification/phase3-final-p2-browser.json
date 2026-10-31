@@ -1,0 +1,60 @@
+{
+  "passed": true,
+  "phase": "Phase 3",
+  "scope": "Phase 2 inherited regression",
+  "baseURL": "http://127.0.0.1:8013",
+  "realModel": false,
+  "realMap": false,
+  "generationMode": "mock",
+  "candidateTtlSeconds": 30,
+  "databaseIsolation": ".runtime/phase1-browser/travel.sqlite3",
+  "browserErrors": [],
+  "externalRequests": [],
+  "results": [
+    {
+      "name": "No-selection UI/API errors are explicit; original trusted three-day cards remain visible",
+      "passed": true
+    },
+    {
+      "name": "Natural-language relaxation request produces three validated mock patches with distinct actual time schedules",
+      "passed": true
+    },
+    {
+      "name": "A → B → C renders shared original card content with isolated readonly data; GET, SQLite, locks and map state remain identical",
+      "passed": true
+    },
+    {
+      "name": "Forged commit Patch/permissions and out-of-scope protected-day writes are rejected without partial updates",
+      "passed": true
+    },
+    {
+      "name": "Adopting B commits exactly its authorized leaves once, version +1; A/C and day 1/day 3 have no side effects",
+      "passed": true
+    },
+    {
+      "name": "Old baseVersion is 409, invalidated candidate is 410; missing LLM configuration is explained without mock fallback",
+      "passed": true
+    },
+    {
+      "name": "Cancelling all previews leaves authoritative data and persistent locks byte-identical",
+      "passed": true
+    },
+    {
+      "name": "Actual server-clock TTL expiry is rejected with 410 and unchanged formal state",
+      "passed": true
+    },
+    {
+      "name": "Desktop panes remain independent; 390px readonly candidate preview has no overflow or runtime code execution",
+      "passed": true
+    }
+  ],
+  "screenshots": [
+    "phase3-final-p2-preview-a.png",
+    "phase3-final-p2-preview-b.png",
+    "phase3-final-p2-preview-c.png",
+    "phase3-final-p2-desktop.png",
+    "phase3-final-p2-candidates.png",
+    "phase3-final-p2-mobile.png",
+    "phase3-final-p2-mobile-candidates.png"
+  ]
+}

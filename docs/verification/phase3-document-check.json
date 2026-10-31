@@ -1,0 +1,18 @@
+{
+  "documents": [
+    "README.md",
+    "启动旅序.md",
+    "docs/architecture.md",
+    "docs/implementation-audit.md",
+    "docs/phase3-acceptance.md",
+    "docs/multiround-test-report.md",
+    "tests/README.md"
+  ],
+  "localLinksChecked": 88,
+  "brokenLinks": [],
+  "originalUnchanged": true,
+  "copyEnvUnchanged": true,
+  "modifiedFiles": 22,
+  "newFiles": 10,
+  "deletedFiles": 0
+}

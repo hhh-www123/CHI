@@ -1,0 +1,8 @@
+{
+  "capturedAt": "2026-10-30T11:46:08.162151+00:00",
+  "port": 8013,
+  "version": "0.6.4-scoped-editor",
+  "serverRevision": "7c2ec85d291b44b29a906a3a89df92a80225c30fd3ac6e77b0261fcbddfcaceb",
+  "projectRootVerified": true,
+  "context": "Inherited browser regression service; behavior run before the final NOOP route-cache branch fix, which is covered by separate backend tests."
+}

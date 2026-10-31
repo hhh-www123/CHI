@@ -1,0 +1,16 @@
+{
+  "baseURL": "http://127.0.0.1:8012",
+  "passed": false,
+  "results": [
+    {
+      "name": "Initial Hangzhou three-day itinerary loads with an explicit demo notice",
+      "passed": true
+    },
+    {
+      "name": "Saved note survives preview and local cards-to-timeline update; hotel and day one remain unchanged",
+      "passed": true
+    }
+  ],
+  "error": "Error: Generate is not disabled for locked day",
+  "pageErrors": []
+}

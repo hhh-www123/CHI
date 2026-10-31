@@ -1,0 +1,68 @@
+[
+  {
+    "event": "candidate_generation",
+    "requestId": "req-bef0848ddfb343629f7b4c455c93f48b",
+    "generationMs": 95.87,
+    "proposed": 3,
+    "accepted": 3,
+    "qualifiedRate": 1.0,
+    "attempts": 1
+  },
+  {
+    "event": "candidate_generation",
+    "requestId": "req-feee4b75738d44ff84df0745834abe61",
+    "generationMs": 93.8,
+    "proposed": 3,
+    "accepted": 3,
+    "qualifiedRate": 1.0,
+    "attempts": 1
+  },
+  {
+    "event": "candidate_generation",
+    "requestId": "req-59fcafe503f549c2a04aac4876ba9bb6",
+    "generationMs": 101.15,
+    "proposed": 3,
+    "accepted": 3,
+    "qualifiedRate": 1.0,
+    "attempts": 1
+  },
+  {
+    "event": "candidate_generation",
+    "requestId": "req-86b5d20de1ea49c38bd74cea6587cb94",
+    "generationMs": 101.27,
+    "proposed": 3,
+    "accepted": 3,
+    "qualifiedRate": 1.0,
+    "attempts": 1
+  },
+  {
+    "event": "candidate_generation",
+    "requestId": "req-5b0f69abd35a4b55abea009b0c0d3ff0",
+    "generationMs": 98.02,
+    "proposed": 3,
+    "accepted": 3,
+    "qualifiedRate": 1.0,
+    "attempts": 1
+  },
+  {
+    "event": "candidate_commit",
+    "candidateId": "p2-19919975fe2144b482bca9697a6e37c1",
+    "version": 2,
+    "commitMs": 79.01
+  },
+  {
+    "event": "candidate_generation",
+    "requestId": "req-1b4bc2ff2e9345dbb661f264d3fbc141",
+    "generationMs": 150.94,
+    "proposed": 3,
+    "accepted": 3,
+    "qualifiedRate": 1.0,
+    "attempts": 1
+  },
+  {
+    "event": "candidate_commit",
+    "candidateId": "p2-17edf6106f6c4bba9f881b43ef797d64",
+    "version": 7,
+    "commitMs": 163.18
+  }
+]

@@ -1,0 +1,158 @@
+{
+  "size": [
+    870,
+    278
+  ],
+  "bounds": [
+    114,
+    95,
+    189,
+    253
+  ],
+  "differentPixels": 8,
+  "details": [
+    {
+      "xy": [
+        185,
+        95
+      ],
+      "before": [
+        208,
+        212,
+        202
+      ],
+      "after": [
+        207,
+        212,
+        201
+      ]
+    },
+    {
+      "xy": [
+        188,
+        95
+      ],
+      "before": [
+        208,
+        212,
+        201
+      ],
+      "after": [
+        207,
+        211,
+        201
+      ]
+    },
+    {
+      "xy": [
+        182,
+        98
+      ],
+      "before": [
+        208,
+        212,
+        201
+      ],
+      "after": [
+        207,
+        211,
+        201
+      ]
+    },
+    {
+      "xy": [
+        114,
+        124
+      ],
+      "before": [
+        208,
+        212,
+        203
+      ],
+      "after": [
+        207,
+        212,
+        202
+      ]
+    },
+    {
+      "xy": [
+        117,
+        124
+      ],
+      "before": [
+        208,
+        212,
+        203
+      ],
+      "after": [
+        207,
+        211,
+        202
+      ]
+    },
+    {
+      "xy": [
+        120,
+        127
+      ],
+      "before": [
+        208,
+        212,
+        203
+      ],
+      "after": [
+        207,
+        212,
+        202
+      ]
+    },
+    {
+      "xy": [
+        184,
+        251
+      ],
+      "before": [
+        85,
+        120,
+        71
+      ],
+      "after": [
+        86,
+        121,
+        72
+      ]
+    },
+    {
+      "xy": [
+        183,
+        252
+      ],
+      "before": [
+        170,
+        188,
+        163
+      ],
+      "after": [
+        169,
+        187,
+        162
+      ]
+    }
+  ],
+  "round": 6,
+  "component": "protected day1 first activity card",
+  "beforeImage": "docs/screenshots/phase3-first-final-failure/round-05-day1.png",
+  "afterImage": "docs/screenshots/phase3-first-final-failure/round-06-day1.png",
+  "maxChannelDelta": 1,
+  "sameDimensions": true,
+  "fontsReadyAwaited": true,
+  "screenshotAnimationsDisabled": true,
+  "rawFraction": 3.307698668651286e-05,
+  "attribution": "Only 8 text/link-edge pixels differ by RGB-channel magnitude 1; consistent with font-edge antialias rounding. This is an inference, not a proof of the sole rendering cause. Crop dimensions are unchanged; protected-card absolute position was not separately captured in this first failed run. Active-day2 DOM geometry is separately tracked in the round report.",
+  "declaredFinalTolerance": {
+    "channelDeltaSignificantIfGreaterThan": 2,
+    "significantPixelsAllowed": 0,
+    "rawFractionMaximum": 0.0001
+  }
+}

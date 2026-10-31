@@ -1,0 +1,9 @@
+{
+  "version": "0.6.2-phase2",
+  "projectMatches": true,
+  "currentBackend": true,
+  "currentFrontend": true,
+  "frontendVersionMatches": true,
+  "servedAssetsMatch": true,
+  "url": "http://127.0.0.1:8011/?v=948ea4fba129-690ca6c8590e"
+}

@@ -1,0 +1,14 @@
+services:
+  travel:
+    build: .
+    ports:
+      - "127.0.0.1:8011:8000"
+    env_file: .env
+    environment:
+      TRAVEL_GENUI_DATA_DIR: /data
+    volumes:
+      - travel-data:/data
+    restart: unless-stopped
+
+volumes:
+  travel-data:

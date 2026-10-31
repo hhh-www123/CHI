@@ -1,0 +1,37 @@
+{
+  "modifiedFiles": [
+    "README.md",
+    "backend/app.py",
+    "backend/candidate_agent.py",
+    "backend/candidate_api.py",
+    "backend/editor_api.py",
+    "backend/patch_guard.py",
+    "backend/revision.py",
+    "backend/test_candidate_api.py",
+    "backend/test_editor_api.py",
+    "backend/test_patch_guard.py",
+    "backend/trip_document.py",
+    "backend/versioning.py",
+    "docs/architecture.md",
+    "docs/implementation-audit.md",
+    "package.json",
+    "src/App.tsx",
+    "src/api.ts",
+    "src/features/agentic-editor/CandidatePanel.tsx",
+    "src/features/agentic-editor/LocalEditor.tsx",
+    "src/features/agentic-editor/candidateSchema.ts",
+    "src/features/agentic-editor/candidateTypes.ts",
+    "src/features/agentic-editor/types.ts",
+    "tests/phase2-schema.cjs",
+    "tests/phase3-ui.cjs",
+    "启动旅序.cmd",
+    "启动旅序.md"
+  ],
+  "newFiles": [
+    "docs/edit-scope-upgrade.md",
+    "tests/edit-scope-ui.cjs"
+  ],
+  "deletedFiles": [],
+  "originalUnchanged": true,
+  "copyEnvUnchanged": true
+}

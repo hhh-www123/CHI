@@ -1,0 +1,36 @@
+{
+  "passed": true,
+  "mode": "demo",
+  "realModel": false,
+  "realMap": false,
+  "baseURL": "http://127.0.0.1:8012/",
+  "sessionDays": [
+    "day1",
+    "day2",
+    "day3"
+  ],
+  "desktop": {
+    "viewport": 1440,
+    "documentWidth": 1440,
+    "dayCards": 3,
+    "panes": [
+      {
+        "className": "itinerary-column",
+        "overflow": "auto",
+        "height": 605,
+        "scrollHeight": 1797
+      },
+      {
+        "className": "control-panel",
+        "overflow": "auto",
+        "height": 603,
+        "scrollHeight": 1186
+      }
+    ]
+  },
+  "mobile": {
+    "viewport": 390,
+    "documentWidth": 390
+  },
+  "browserErrors": []
+}

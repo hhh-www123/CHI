@@ -1,0 +1,4 @@
+# Source files use LF; Windows batch launchers use CRLF.
+* text=auto eol=lf
+*.cmd text eol=crlf
+*.bat text eol=crlf

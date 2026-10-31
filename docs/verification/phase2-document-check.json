@@ -1,0 +1,18 @@
+{
+  "documents": [
+    "README.md",
+    "启动旅序.md",
+    "Agentic_UI_三日游_技术实施规范.md",
+    "docs/architecture.md",
+    "docs/phase2-acceptance.md",
+    "docs/implementation-audit.md",
+    "tests/README.md"
+  ],
+  "localLinksChecked": 62,
+  "brokenLinks": [],
+  "originalUnchanged": true,
+  "copyEnvUnchanged": true,
+  "modifiedFiles": 19,
+  "newFiles": 13,
+  "deletedFiles": 0
+}
