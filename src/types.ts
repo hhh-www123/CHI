@@ -22,6 +22,10 @@ export interface AgentStatus {
   capabilities: string[];
   mapConfigured: boolean;
 }
+export interface IntegrationStatus {
+  model: { configured: boolean; baseUrl: string; model: string; provider: string; runtimeOverride: boolean };
+  amap: { configured: boolean; baseUrl: string; runtimeOverride: boolean };
+}
 export interface RoutePoint {
   stopId: string;
   name: string;
@@ -73,6 +77,10 @@ export interface Place {
   sourceName?: string;
   verifiedAt?: string;
   costEstimated?: boolean;
+  highlights?: string[];
+  visitTip?: string;
+  priceNote?: string;
+  optionalCost?: number;
 }
 
 export interface Hotel {
@@ -87,9 +95,45 @@ export interface Hotel {
   sourceName?: string;
   verifiedAt?: string;
   priceEstimated?: boolean;
+  nightlyPriceRange?: [number, number];
+  priceNote?: string;
 }
 
-export interface Catalog { places: Place[]; hotels: Hotel[] }
+export interface CuratedRoute {
+  id: string;
+  title: string;
+  theme: string;
+  summary: string;
+  placeIds: string[];
+  durationMinutes: number;
+  budgetPerPerson: { admission: number; transport: number; food: number; optional: number; total: number };
+  sourceName?: string;
+  sourceUrl?: string;
+}
+export interface GuideRecommendation {
+  id: string;
+  name: string;
+  location: string;
+  category: string;
+  indoor: boolean;
+  durationMinutes: number;
+  estimatedCost: number;
+  mapQuery: string;
+  priceNote: string;
+  description: string;
+  sourceName?: string;
+  sourceUrl?: string;
+}
+export interface Catalog {
+  city?: string;
+  version?: string;
+  places: Place[];
+  hotels: Hotel[];
+  pricing?: { currency: 'CNY'; foodPerPersonDay: number; reviewedOn: string; notice: string };
+  curatedRoutes?: CuratedRoute[];
+  guideRecommendations?: GuideRecommendation[];
+  guideSource?: { name: string; url: string; reviewedOn: string; notice: string };
+}
 export interface TripStop { id: string; placeId: string; startTime: string; description?: string }
 export interface TripDay { date: string; title: string; stops: TripStop[]; note: string }
 export interface GeneratedSurface {
@@ -140,6 +184,10 @@ export interface PlanningSettings extends TripSetupRequest {
   budgetBasis?: string;
   pricingNotice?: string;
   warnings?: string[];
+  message?: string;
+  estimatedTotal?: number;
+  generationMode?: 'deterministic-demo' | 'llm';
+  generationBasis?: string[];
 }
 export interface Session {
   tripDocument?: TripDocument;

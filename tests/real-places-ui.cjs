@@ -35,15 +35,17 @@ const executablePath = ['C:/Program Files (x86)/Microsoft/Edge/Application/msedg
  try {
   await openLegacyTrip(page, context, base);await page.getByRole('tabpanel').waitFor();
   const catalog=await (await context.request.get(base+'/api/catalog')).json();
-  assert.equal(catalog.places.length,15);assert.equal(catalog.hotels.length,3);
+  assert.equal(catalog.places.length,27);assert.equal(catalog.hotels.length,12);
   assert.equal(await page.locator('select[data-testid^="alternative-"]').count(),3);
   const first=page.getByTestId('alternative-day2-stop-1');
-  assert.equal(await first.locator('option').count(),13);
+  assert.equal(await first.locator('option').count(),25);
+  assert.equal(await first.locator('option[value="guide-lingyin"]').count(),1);
   assert.equal(await first.locator('option[value="bamboo-path"]').count(),0);
   assert.equal(await first.locator('option[value="tea-house"]').count(),0);
   assert.ok(await page.getByRole('heading',{name:'龙井村（牌坊）',exact:true}).isVisible());
-  assert.equal(await page.getByLabel('选择酒店',{exact:true}).locator('option').count(),3);
-  results.push('15 real places and 3 real hotels; per-stop grouped dropdown excludes same-day duplicates');
+  assert.equal(await page.getByLabel('选择酒店',{exact:true}).locator('option').count(),12);
+  assert.equal(await page.locator('.day-tab-budget').count(),3);
+  results.push('27 places and 12 hotels are selectable; date tabs show compact budget totals and place dropdowns exclude same-day duplicates');
   const note='实测：下午留出休息时间，换景点后保留这条备注。';
   await page.getByLabel('第二天行程备注',{exact:true}).fill(note);
   await responseFor('PATCH','/direct',()=>page.getByLabel('第二天行程备注',{exact:true}).press('Tab'));

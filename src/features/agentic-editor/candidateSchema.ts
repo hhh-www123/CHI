@@ -54,7 +54,7 @@ export function parseCandidateBatch(value: unknown, current: TripDocument, conte
     if (ids.has(candidate.candidateId) || strategies.has(candidate.strategy) || candidate.baseVersion !== current.version) throw new Error('候选身份或版本无效');
     ids.add(candidate.candidateId); strategies.add(candidate.strategy);
     const actual = leafDiff(current, candidate.document).sort();
-    if (!actual.length || !equalPaths(actual, candidate.changedPaths) || !equalPaths(candidate.differences.map(item => item.path), actual)) throw new Error('候选真实差异与声明不符');
+    if (!actual.length || !equalPaths(actual, candidate.changedPaths) || !equalPaths(candidate.differences.map(item => item.path), actual)) throw new Error('候选实际差异与声明不符');
     const expected = structuredClone(current);
     const paths = new Set<string>();
     const edited = new Map<string, Set<EditorField>>();

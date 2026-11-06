@@ -4,7 +4,7 @@ from __future__ import annotations
 from copy import deepcopy
 import re
 
-from .catalog import CATALOG_VERSION, HOTELS, PLACES
+from .catalog import CATALOG_VERSION, CURATED_ROUTES, GUIDE_RECOMMENDATIONS, GUIDE_SOURCE, HOTELS, PLACES, PRICING_POLICY
 
 MAX_DAYS = 14
 REGION_PATTERN = r"^day-(?:[1-9]|1[0-4])$"
@@ -36,8 +36,35 @@ def day_names(snapshot: dict | None = None) -> dict[str, str]:
     return {region: day_label(int(region.split("-")[1])) for region in region_map(snapshot)}
 
 
+def curated_catalog_needs_upgrade(snapshot: dict | None) -> bool:
+    if not isinstance(snapshot, dict):
+        return False
+    catalog = snapshot.get("catalog")
+    version = catalog.get("version") if isinstance(catalog, dict) else None
+    version = version or snapshot.get("catalogVersion")
+    city = catalog.get("city") if isinstance(catalog, dict) else None
+    city = city or snapshot.get("tripState", {}).get("city")
+    return (
+        isinstance(version, str)
+        and version.startswith("hangzhou-curated-")
+        and version != CATALOG_VERSION
+        and isinstance(city, str)
+        and city.rstrip("市") == "杭州"
+    )
+
+
 def session_catalog(snapshot: dict | None = None) -> dict:
     catalog = snapshot.get("catalog") if isinstance(snapshot, dict) else None
-    if isinstance(catalog, dict) and isinstance(catalog.get("places"), list) and isinstance(catalog.get("hotels"), list):
+    if (isinstance(catalog, dict) and isinstance(catalog.get("places"), list)
+            and isinstance(catalog.get("hotels"), list) and not curated_catalog_needs_upgrade(snapshot)):
         return deepcopy(catalog)
-    return {"places": deepcopy(PLACES), "hotels": deepcopy(HOTELS), "version": CATALOG_VERSION, "city": "杭州"}
+    return {
+        "places": deepcopy(PLACES),
+        "hotels": deepcopy(HOTELS),
+        "version": CATALOG_VERSION,
+        "city": "杭州",
+        "pricing": deepcopy(PRICING_POLICY),
+        "curatedRoutes": deepcopy(CURATED_ROUTES),
+        "guideRecommendations": deepcopy(GUIDE_RECOMMENDATIONS),
+        "guideSource": deepcopy(GUIDE_SOURCE),
+    }

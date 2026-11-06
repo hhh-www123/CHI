@@ -348,7 +348,7 @@ def _navigation(origin: dict, destination: dict, mode: str) -> str:
 
 
 def _segment(client: httpx.Client, key: str, origin: dict, destination: dict, mode: str, date: str) -> dict:
-    result = {"fromStopId": origin["stopId"], "toStopId": destination["stopId"], "fromName": origin["name"], "toName": destination["name"], "mode": mode, "status": "unavailable", "durationMinutes": None, "distanceMeters": None, "summary": "起点或终点尚未确认，无法查询真实交通方案。", "path": [], "navigationUrl": None}
+    result = {"fromStopId": origin["stopId"], "toStopId": destination["stopId"], "fromName": origin["name"], "toName": destination["name"], "mode": mode, "status": "unavailable", "durationMinutes": None, "distanceMeters": None, "summary": "起点或终点尚未确认，无法查询交通方案。", "path": [], "navigationUrl": None}
     if origin["status"] != "resolved" or destination["status"] != "resolved":
         return result
     result["navigationUrl"] = _navigation(origin, destination, mode)
@@ -415,7 +415,7 @@ def enrich_day(day: dict, places_by_id: dict[str, dict], city: str, mode: str) -
     ready = sum(segment["status"] == "ready" for segment in segments)
     resolved = sum(point["status"] == "resolved" for point in points)
     if not settings.amap_key:
-        status, message = "unconfigured", "地图服务尚未配置。可以打开景点搜索；真实交通方式、时长与路线将在地图服务连接后查询。"
+        status, message = "unconfigured", "地图服务尚未配置。可以打开景点搜索；交通方式、时长与路线将在地图服务连接后查询。"
     elif points and resolved == len(points) and ready == len(segments):
         status, message = "ready", "位置与交通数据来自高德地图；时长为查询时的路线方案，请出行前再次确认。"
     elif ready or resolved:

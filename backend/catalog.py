@@ -1,11 +1,11 @@
-"""Verified Hangzhou places and hotels, checked on 2026-10-25.
+"""Curated Hangzhou places, hotels and guide references.
 
-All POI IDs were checked against the live AMap detail API. Coordinates are
-resolved at query time; no location is invented. Amounts below are planning
-allowances, not live ticket or room-price quotations.
+Entries carrying a POI ID were checked against the AMap detail API. Other
+guide entries keep an address and search query so the map provider can resolve
+them at request time. Amounts are planning allowances, not live quotations.
 """
 
-CATALOG_VERSION = 'hangzhou-real-20261025'
+CATALOG_VERSION = 'hangzhou-curated-20261106-v2'
 
 PLACES = [{'id': 'west-lake',
   'name': '断桥残雪',
@@ -436,4 +436,405 @@ HOTELS = [{'id': 'lake-hotel',
   'livePoiVerified': True,
   'priceEstimated': True,
   'description': '住宿预算供行程规划参考，实际房型、房价与可订情况请按入住日期向酒店确认。',
+  'sourceName': '高德地点资料'},
+ {'id': 'grand-hyatt-hangzhou',
+  'name': '杭州君悦酒店',
+  'address': '杭州市上城区湖滨路28号',
+  'location': '湖滨商圈',
+  'mapQuery': '杭州君悦酒店',
+  'sourceUrl': 'https://www.hyatt.com/grand-hyatt/en-US/hangh-grand-hyatt-hangzhou',
+  'mapSourceUrl': 'https://uri.amap.com/search?keyword=杭州君悦酒店&city=杭州&view=map&src=travel-genui&callnative=0',
+  'nightlyPrice': 1500,
+  'fictional': False,
+  'mapAliases': ['杭州君悦酒店', 'Grand Hyatt Hangzhou'],
+  'priceEstimated': True,
+  'description': '位于湖滨商圈，适合以西湖东线、湖滨步行街和上城片区为主要活动范围的行程。',
+  'sourceName': '酒店官方网站'},
+ {'id': 'four-seasons-west-lake',
+  'name': '杭州西子湖四季酒店',
+  'address': '杭州市西湖区灵隐路5号',
+  'location': '西湖西线',
+  'mapQuery': '杭州西子湖四季酒店',
+  'sourceUrl': 'https://www.fourseasons.com/hangzhou/',
+  'mapSourceUrl': 'https://uri.amap.com/search?keyword=杭州西子湖四季酒店&city=杭州&view=map&src=travel-genui&callnative=0',
+  'nightlyPrice': 3200,
+  'fictional': False,
+  'mapAliases': ['杭州西子湖四季酒店', 'Four Seasons Hotel Hangzhou at West Lake'],
+  'priceEstimated': True,
+  'description': '靠近西湖西线与灵隐片区，适合把园林式住宿体验和西湖、灵隐行程放在一起。',
+  'sourceName': '酒店官方网站'},
+ {'id': 'banyan-tree-xixi',
+  'name': '杭州西溪悦榕庄',
+  'address': '杭州市西湖区紫金港路21号西溪天堂国际旅游综合体2号',
+  'location': '西溪片区',
+  'mapQuery': '杭州西溪悦榕庄',
+  'sourceUrl': 'https://www.banyantree.com/china/hangzhou',
+  'mapSourceUrl': 'https://uri.amap.com/search?keyword=杭州西溪悦榕庄&city=杭州&view=map&src=travel-genui&callnative=0',
+  'nightlyPrice': 1800,
+  'fictional': False,
+  'mapAliases': ['杭州西溪悦榕庄', 'Banyan Tree Hangzhou'],
+  'priceEstimated': True,
+  'description': '位于西溪天堂片区，适合西溪湿地慢游或希望减少度假日通勤的行程。',
+  'sourceName': '酒店官方网站'},
+ {'id': 'midtown-shangri-la',
+  'name': '杭州城中香格里拉',
+  'address': '杭州市拱墅区长寿路6号',
+  'location': '武林商圈',
+  'mapQuery': '杭州城中香格里拉',
+  'sourceUrl': 'https://www.shangri-la.com/hangzhou/midtownshangrila/',
+  'mapSourceUrl': 'https://uri.amap.com/search?keyword=杭州城中香格里拉&city=杭州&view=map&src=travel-genui&callnative=0',
+  'nightlyPrice': 1100,
+  'fictional': False,
+  'mapAliases': ['杭州城中香格里拉', 'Midtown Shangri-La Hangzhou'],
+  'priceEstimated': True,
+  'description': '位于武林商圈，兼顾湖滨、运河与城市公共交通，适合作为多片区行程的落脚点。',
+  'sourceName': '酒店官方网站'},
+ {'id': 'jw-marriott-hangzhou',
+  'name': '杭州JW万豪酒店',
+  'address': '杭州市拱墅区湖墅南路28号',
+  'location': '武林商圈',
+  'mapQuery': '杭州JW万豪酒店',
+  'sourceUrl': 'https://www.marriott.com/en-us/hotels/hghjw-jw-marriott-hotel-hangzhou/overview/',
+  'mapSourceUrl': 'https://uri.amap.com/search?keyword=杭州JW万豪酒店&city=杭州&view=map&src=travel-genui&callnative=0',
+  'nightlyPrice': 900,
+  'fictional': False,
+  'mapAliases': ['杭州JW万豪酒店', 'JW Marriott Hotel Hangzhou'],
+  'priceEstimated': True,
+  'description': '位于湖墅南路与武林片区，前往运河、西湖东线和市中心都较方便。',
+  'sourceName': '酒店官方网站'},
+ {'id': 'canopy-west-lake',
+  'name': '杭州西湖希尔顿嘉悦里酒店',
+  'address': '杭州市上城区国货路2号',
+  'location': '湖滨商圈',
+  'mapQuery': '杭州西湖希尔顿嘉悦里酒店',
+  'sourceUrl': 'https://www.hilton.com/en/hotels/hghpyqq-canopy-hangzhou-west-lake/',
+  'mapSourceUrl': 'https://uri.amap.com/search?keyword=杭州西湖希尔顿嘉悦里酒店&city=杭州&view=map&src=travel-genui&callnative=0',
+  'nightlyPrice': 800,
+  'fictional': False,
+  'mapAliases': ['杭州西湖希尔顿嘉悦里酒店', 'Canopy by Hilton Hangzhou West Lake'],
+  'priceEstimated': True,
+  'description': '靠近湖滨与上城街区，适合步行衔接西湖、清河坊和南山路一带。',
+  'sourceName': '酒店官方网站'},
+ {'id': 'conrad-hangzhou',
+  'name': '杭州康莱德酒店',
+  'address': '杭州市上城区新业路228号',
+  'location': '钱江新城',
+  'mapQuery': '杭州康莱德酒店',
+  'sourceUrl': 'https://www.hilton.com/en/hotels/hghxici-conrad-hangzhou/',
+  'mapSourceUrl': 'https://uri.amap.com/search?keyword=杭州康莱德酒店&city=杭州&view=map&src=travel-genui&callnative=0',
+  'nightlyPrice': 1200,
+  'fictional': False,
+  'mapAliases': ['杭州康莱德酒店', 'Conrad Hangzhou'],
+  'priceEstimated': True,
+  'description': '位于钱江新城，适合安排城市天际线、江岸或以东部交通枢纽为重点的行程。',
+  'sourceName': '酒店官方网站'},
+ {'id': 'holiday-inn-express-westlake-east',
+  'name': '杭州西湖东智选假日酒店',
+  'address': '杭州市上城区西湖大道2号',
+  'location': '城站片区',
+  'mapQuery': '杭州西湖东智选假日酒店',
+  'sourceUrl': 'https://www.ihg.com/holidayinnexpress/hotels/us/en/hangzhou/hghhd/hoteldetail',
+  'mapSourceUrl': 'https://uri.amap.com/search?keyword=杭州西湖东智选假日酒店&city=杭州&view=map&src=travel-genui&callnative=0',
+  'nightlyPrice': 420,
+  'fictional': False,
+  'mapAliases': ['杭州西湖东智选假日酒店', 'Holiday Inn Express Hangzhou Westlake East'],
+  'priceEstimated': True,
+  'description': '靠近杭州站与西湖大道，适合看重交通衔接和住宿预算的短途行程。',
+  'sourceName': '酒店官方网站'},
+ {'id': 'zhejiang-hotel',
+  'name': '浙江饭店',
+  'address': '杭州市拱墅区延安路447号',
+  'location': '武林商圈',
+  'mapQuery': '浙江饭店',
+  'sourceUrl': 'https://uri.amap.com/search?keyword=浙江饭店&city=杭州&view=map&src=travel-genui&callnative=0',
+  'mapSourceUrl': 'https://uri.amap.com/search?keyword=浙江饭店&city=杭州&view=map&src=travel-genui&callnative=0',
+  'nightlyPrice': 520,
+  'fictional': False,
+  'mapAliases': ['浙江饭店', '浙江饭店杭州'],
+  'priceEstimated': True,
+  'description': '位于延安路与武林商圈，适合希望兼顾市中心交通、餐饮和预算的行程。',
   'sourceName': '高德地点资料'}]
+
+
+# A single pricing policy keeps backend totals, previews and guide cards aligned.
+# Values are conservative planning allowances for one adult, not quotations.
+PRICING_POLICY = {
+  'currency': 'CNY',
+  'foodPerPersonDay': 180,
+  'reviewedOn': '2026-11-06',
+  'notice': '餐饮按每人每天¥180预留；门票、交通与住宿均为规划估算，节假日、房型和优惠会改变实际价格。',
+}
+
+GUIDE_SOURCE = {
+  'name': '杭州市文化广电旅游局《杭州文旅指南》与公开旅游攻略',
+  'url': 'https://wgly.hangzhou.gov.cn/attach/538/2307051510367229.pdf',
+  'reviewedOn': '2026-11-06',
+  'notice': '攻略用于行程灵感；开放、预约和价格应在出发前向运营方复核。',
+}
+
+_PLACE_GUIDE = {
+  'west-lake': {
+    'highlights': ['断桥与白堤湖景', '西湖十景线索'],
+    'visitTip': '清晨或傍晚步行更从容；湖面游船不包含在本条目的预算中。',
+    'priceNote': '断桥与白堤免费开放；游船及其他收费项目另计。',
+  },
+  'tea-village': {
+    'highlights': ['西湖龙井茶园', '茶村慢行'],
+    'visitTip': '村道适合与中国茶叶博物馆组合；品茶或采茶体验先问清项目和价格。',
+    'priceNote': '村道游览免费；餐饮、品茶和采茶体验按现场项目另计。',
+  },
+  'hefang-street': {
+    'highlights': ['南宋御街相邻', '老字号与传统街巷'],
+    'visitTip': '傍晚到夜间氛围较好，消费项多，建议先设餐饮和伴手礼上限。',
+    'priceNote': '街区免费开放；场馆、餐饮和购物另计。',
+  },
+  'bamboo-path': {
+    'highlights': ['竹林步道', '山谷慢行'],
+    'visitTip': '雨后石阶可能湿滑，建议穿防滑鞋并预留返程交通时间。',
+    'priceNote': '按每人¥20预留入园费用；实际票价与优惠以出发日公告为准。',
+  },
+  'canal-walk': {
+    'highlights': ['京杭大运河南端', '桥西历史街区'],
+    'visitTip': '可与运河博物馆、工艺美术馆和扇博物馆步行串联。',
+    'priceNote': '古桥及街区免费开放；体验项目另计。',
+  },
+  'wetland': {
+    'highlights': ['湿地生态', '高庄园林'],
+    'visitTip': '园区较大，半日游建议选择一处入口和一条主线，避免来回折返。',
+    'priceNote': '门票按每人¥80预留；电瓶船可另按每人¥60预留，摇橹船通常按船计价。',
+    'optionalCost': 60,
+  },
+  'city-museum': {
+    'highlights': ['孤山园林', '浙江历史与艺术'],
+    'visitTip': '与断桥、白堤同片区；展览和预约要求以馆方当日公告为准。',
+    'priceNote': '基本参观按免费预留，特展或活动另行确认。',
+  },
+  'art-space': {
+    'highlights': ['江南建筑', '近现代与当代美术'],
+    'visitTip': '适合与南山路、西湖南线组合，周一闭馆等信息请在出发前复核。',
+    'priceNote': '基本参观按免费预留，临时展览或活动另行确认。',
+  },
+  'canal-museum': {
+    'highlights': ['大运河历史', '运河文化广场'],
+    'visitTip': '与拱宸桥相邻，可作为运河主题半日路线的室内核心。',
+    'priceNote': '基本参观按免费预留，预约与开放安排以馆方为准。',
+  },
+  'tea-house': {
+    'highlights': ['中华茶文化展', '西湖龙井专题'],
+    'visitTip': '双峰馆区靠近龙井片区，适合安排在茶村游览之前。',
+    'priceNote': '基本参观按免费预留，茶事体验和消费项目另计。',
+  },
+  'craft-space': {
+    'highlights': ['杭州传统工艺', '大师工作室'],
+    'visitTip': '可与桥西博物馆群步行串联；手作体验需另行预约和付费。',
+    'priceNote': '基本参观按免费预留，手作体验材料费另计。',
+  },
+  'book-space': {
+    'highlights': ['中国扇文化', '桥西博物馆群'],
+    'visitTip': '与工艺美术博物馆距离较近，适合雨天连续参观。',
+    'priceNote': '基本参观按免费预留，活动与文创消费另计。',
+  },
+  'silk-museum': {
+    'highlights': ['丝绸历史', '织造与服饰文化'],
+    'visitTip': '馆区内容丰富，建议至少预留两小时；体验活动以馆方安排为准。',
+    'priceNote': '基本参观按免费预留，体验课程或临展另行确认。',
+  },
+  'deshou-palace': {
+    'highlights': ['南宋宫殿遗址', '宋韵建筑展示'],
+    'visitTip': '通常需要预约，适合与清河坊和杭州博物馆组成南宋主题线路。',
+    'priceNote': '官方指南标注免费，需提前核对预约名额。',
+  },
+  'hangzhou-museum': {
+    'highlights': ['杭州城市历史', '吴山片区'],
+    'visitTip': '适合与清河坊、南宋德寿宫组合，预约和闭馆日以馆方为准。',
+    'priceNote': '基本参观按免费预留，活动与临展另行确认。',
+  },
+}
+
+for _place in PLACES:
+  _place.update(_PLACE_GUIDE[_place['id']])
+  _place['contentReviewedOn'] = '2026-11-06'
+
+_HOTEL_BUDGETS = {
+  'lake-hotel': (900, [750, 1500]),
+  'canal-hotel': (650, [500, 950]),
+  'garden-hotel': (1500, [1100, 2400]),
+  'grand-hyatt-hangzhou': (1500, [1000, 2400]),
+  'four-seasons-west-lake': (3200, [2400, 5200]),
+  'banyan-tree-xixi': (1800, [1300, 3000]),
+  'midtown-shangri-la': (1100, [750, 1800]),
+  'jw-marriott-hangzhou': (900, [650, 1500]),
+  'canopy-west-lake': (800, [550, 1300]),
+  'conrad-hangzhou': (1200, [850, 2100]),
+  'holiday-inn-express-westlake-east': (420, [300, 700]),
+  'zhejiang-hotel': (520, [380, 850]),
+}
+for _hotel in HOTELS:
+  _midpoint, _price_range = _HOTEL_BUDGETS[_hotel['id']]
+  _hotel.update(
+    nightlyPrice=_midpoint,
+    nightlyPriceRange=_price_range,
+    priceReviewedOn='2026-11-06',
+    priceNote=f"按每间每晚¥{_price_range[0]}–¥{_price_range[1]}作为常规规划区间，当前预算采用¥{_midpoint}；实际价格随日期、房型和退改条件变化。",
+  )
+
+
+CURATED_ROUTES = [
+  {
+    'id': 'west-lake-culture', 'title': '湖山与博物', 'theme': '西湖人文',
+    'summary': '从断桥和白堤进入西湖，再用孤山馆区与浙江美术馆补足人文内容。',
+    'placeIds': ['west-lake', 'city-museum', 'art-space'], 'durationMinutes': 420,
+    'budgetPerPerson': {'admission': 0, 'transport': 56, 'food': 180, 'optional': 0, 'total': 236},
+  },
+  {
+    'id': 'tea-culture', 'title': '龙井茶文化慢游', 'theme': '茶园与展馆',
+    'summary': '茶叶博物馆、龙井村与云栖竹径组合，避免把茶园、展馆和竹林拆成多次往返。',
+    'placeIds': ['tea-house', 'tea-village', 'bamboo-path'], 'durationMinutes': 390,
+    'budgetPerPerson': {'admission': 20, 'transport': 68, 'food': 180, 'optional': 0, 'total': 268},
+  },
+  {
+    'id': 'southern-song', 'title': '南宋寻迹', 'theme': '宋韵与街巷',
+    'summary': '德寿宫、杭州博物馆与清河坊串联，兼顾遗址、城市史和街区生活。',
+    'placeIds': ['deshou-palace', 'hangzhou-museum', 'hefang-street'], 'durationMinutes': 390,
+    'budgetPerPerson': {'admission': 0, 'transport': 48, 'food': 180, 'optional': 0, 'total': 228},
+  },
+  {
+    'id': 'grand-canal-crafts', 'title': '运河非遗与桥西', 'theme': '运河与手工艺',
+    'summary': '拱宸桥、运河博物馆和桥西工艺场馆集中安排，适合步行与雨天切换。',
+    'placeIds': ['canal-walk', 'canal-museum', 'craft-space', 'book-space'], 'durationMinutes': 450,
+    'budgetPerPerson': {'admission': 0, 'transport': 68, 'food': 180, 'optional': 0, 'total': 248},
+  },
+  {
+    'id': 'xixi-slow-day', 'title': '西溪湿地慢游', 'theme': '生态与园林',
+    'summary': '只选一处入口和一条主线，把步行、园林与可选游船控制在一个从容日程内。',
+    'placeIds': ['wetland'], 'durationMinutes': 360,
+    'budgetPerPerson': {'admission': 80, 'transport': 30, 'food': 180, 'optional': 60, 'total': 350},
+  },
+]
+
+
+# These guide suggestions also become editable places below. They intentionally
+# keep search queries instead of unconfirmed provider POI IDs.
+GUIDE_RECOMMENDATIONS = [
+  {'id': 'guide-lingyin', 'name': '灵隐飞来峰片区', 'location': '西湖区', 'category': '寺院与石窟', 'indoor': False, 'durationMinutes': 180, 'estimatedCost': 75, 'mapQuery': '灵隐飞来峰景区', 'priceNote': '按飞来峰与寺院合计¥75/人预留，实际分项票价与政策需复核。', 'description': '公开攻略中的杭州高频人文景点，建议避开高峰并提前确认预约及入园规则。'},
+  {'id': 'guide-leifeng', 'name': '雷峰塔景区', 'location': '西湖南线', 'category': '历史地标', 'indoor': False, 'durationMinutes': 90, 'estimatedCost': 40, 'mapQuery': '雷峰塔景区', 'priceNote': '按¥40/人预留，优惠及开放时间以景区公告为准。', 'description': '可与花港观鱼、苏堤或南山路组合，减少跨城往返。'},
+  {'id': 'guide-lake-cruise', 'name': '西湖游船与三潭印月', 'location': '西湖水域', 'category': '游船体验', 'indoor': False, 'durationMinutes': 120, 'estimatedCost': 70, 'mapQuery': '三潭印月', 'priceNote': '按船票与上岛合计¥70/人预留，不同码头和船型价格可能不同。', 'description': '适合作为西湖环线中的独立时段，不与远郊景点安排在同一半天。'},
+  {'id': 'guide-botanical', 'name': '杭州植物园', 'location': '西湖区', 'category': '园林植物', 'indoor': False, 'durationMinutes': 150, 'estimatedCost': 10, 'mapQuery': '杭州植物园', 'priceNote': '按¥10/人预留，专题园或活动可能另计。', 'description': '适合与玉泉、北山或灵隐片区组合，季节性较强。'},
+  {'id': 'guide-jiuxi', 'name': '九溪烟树', 'location': '西湖区', 'category': '山水徒步', 'indoor': False, 'durationMinutes': 180, 'estimatedCost': 0, 'mapQuery': '九溪烟树', 'priceNote': '步道按免费预留，接驳、餐饮和体验另计。', 'description': '攻略常见的轻徒步选择；雨天路滑，需根据体力和天气调整。'},
+  {'id': 'guide-huxueyan', 'name': '胡雪岩故居', 'location': '上城区', 'category': '历史建筑', 'indoor': True, 'durationMinutes': 90, 'estimatedCost': 20, 'mapQuery': '胡雪岩故居', 'priceNote': '按¥20/人预留，开放与优惠政策需复核。', 'description': '可接入清河坊、南宋御街与德寿宫的上城历史线路。'},
+  {'id': 'guide-liangzhu-museum', 'name': '良渚博物院', 'location': '余杭区', 'category': '考古博物馆', 'indoor': True, 'durationMinutes': 150, 'estimatedCost': 0, 'mapQuery': '良渚博物院', 'priceNote': '基本参观按免费预留，通常需要预约。', 'description': '适合与良渚古城遗址公园组成整日线路，不建议与西湖景点硬拼半天。'},
+  {'id': 'guide-liangzhu-park', 'name': '良渚古城遗址公园', 'location': '余杭区', 'category': '世界遗产', 'indoor': False, 'durationMinutes': 240, 'estimatedCost': 60, 'mapQuery': '良渚古城遗址公园', 'priceNote': '按¥60/人基础门票预留，接驳和体验项目另计。', 'description': '园区尺度较大，建议预留半天以上并提前核对预约、交通和天气。'},
+  {'id': 'guide-version-museum', 'name': '杭州国家版本馆', 'location': '余杭区', 'category': '文化场馆', 'indoor': True, 'durationMinutes': 150, 'estimatedCost': 0, 'mapQuery': '杭州国家版本馆', 'priceNote': '基本参观按免费预留，预约放号与开放日期需提前确认。', 'description': '公开攻略常与良渚片区组合，预约不确定时应准备替代场馆。'},
+  {'id': 'guide-xiaohe', 'name': '小河直街历史文化街区', 'location': '拱墅区', 'category': '历史街区', 'indoor': False, 'durationMinutes': 90, 'estimatedCost': 0, 'mapQuery': '小河直街历史文化街区', 'priceNote': '街区按免费预留，餐饮、展览和购物另计。', 'description': '可与拱宸桥、桥西博物馆群组合成运河主题线路。'},
+  {'id': 'guide-taiziwan', 'name': '太子湾公园', 'location': '西湖南线', 'category': '城市公园', 'indoor': False, 'durationMinutes': 120, 'estimatedCost': 0, 'mapQuery': '太子湾公园', 'priceNote': '公园按免费预留，花季预约或交通管理以公告为准。', 'description': '花季热度高，建议错峰，并与苏堤、花港观鱼组合。'},
+  {'id': 'guide-city-god', 'name': '城隍阁', 'location': '上城区吴山', 'category': '城市观景', 'indoor': True, 'durationMinutes': 90, 'estimatedCost': 30, 'mapQuery': '城隍阁', 'priceNote': '杭州文旅指南列示¥30/人，出发前再次核对。', 'description': '适合接在清河坊之后，从吴山方向俯瞰江、湖与城区。'},
+]
+
+_GUIDE_PLACE_DETAILS = {
+  'guide-lingyin': {
+    'address': '杭州市西湖区灵隐路法云弄1号', 'transportCost': 30,
+    'mapAliases': ['灵隐飞来峰片区', '灵隐飞来峰景区', '飞来峰景区'],
+    'highlights': ['飞来峰石刻造像', '灵隐寺院园林'],
+    'visitTip': '建议预留半天并尽量错峰；寺院与飞来峰可能分别检票，出发前核对预约规则。',
+  },
+  'guide-leifeng': {
+    'address': '杭州市西湖区南山路15号', 'transportCost': 18,
+    'mapAliases': ['雷峰塔景区', '雷峰塔'],
+    'highlights': ['雷峰塔观景', '西湖南线湖景'],
+    'visitTip': '傍晚视野较好，可与净慈寺、花港观鱼或太子湾安排在同一片区。',
+  },
+  'guide-lake-cruise': {
+    'address': '杭州市西湖风景名胜区西湖水域', 'transportCost': 15,
+    'mapAliases': ['西湖游船与三潭印月', '三潭印月', '西湖游船'],
+    'highlights': ['三潭印月湖景', '乘船上岛体验'],
+    'visitTip': '先确认上船与返程码头；末班船、天气和客流会影响游览时间。',
+  },
+  'guide-botanical': {
+    'address': '杭州市西湖区桃源岭1号', 'transportCost': 18,
+    'mapAliases': ['杭州植物园', '杭州植物园玉泉景区'],
+    'highlights': ['植物专类园', '玉泉与山林步道'],
+    'visitTip': '不同季节看点差异较大，可与北山、灵隐或青芝坞片区顺路组合。',
+  },
+  'guide-jiuxi': {
+    'address': '杭州市西湖区九溪十八涧', 'transportCost': 26,
+    'mapAliases': ['九溪烟树', '九溪十八涧'],
+    'highlights': ['溪谷林荫步道', '九溪十八涧'],
+    'visitTip': '步道较长且出入口不止一处，先选定路线方向；雨后注意湿滑。',
+  },
+  'guide-huxueyan': {
+    'address': '杭州市上城区元宝街18号', 'transportCost': 15,
+    'mapAliases': ['胡雪岩故居', '胡雪岩旧居'],
+    'highlights': ['晚清宅园建筑', '江南园林空间'],
+    'visitTip': '与清河坊、德寿宫距离较近，适合组成上城历史街区半日线。',
+  },
+  'guide-liangzhu-museum': {
+    'address': '杭州市余杭区美丽洲路1号', 'transportCost': 36,
+    'mapAliases': ['良渚博物院', '良渚博物馆'],
+    'highlights': ['良渚文明展览', '玉器与考古成果'],
+    'visitTip': '通常需要预约；若同日去遗址公园，建议先按预约时段确定先后顺序。',
+  },
+  'guide-liangzhu-park': {
+    'address': '杭州市余杭区瓶窑镇凤都路附近', 'transportCost': 40,
+    'mapAliases': ['良渚古城遗址公园', '良渚古城遗址'],
+    'highlights': ['良渚古城遗址', '宫殿区与水利系统'],
+    'visitTip': '园区尺度大且户外路段多，建议预留半天以上并关注接驳与天气。',
+  },
+  'guide-version-museum': {
+    'address': '杭州市余杭区瓶窑镇文润路1号', 'transportCost': 36,
+    'mapAliases': ['杭州国家版本馆', '中国国家版本馆杭州分馆'],
+    'highlights': ['宋韵建筑空间', '中华版本文化展览'],
+    'visitTip': '预约与开放日期可能调整，先取得预约再与良渚片区的其他地点组合。',
+  },
+  'guide-xiaohe': {
+    'address': '杭州市拱墅区小河直街', 'transportCost': 18,
+    'mapAliases': ['小河直街历史文化街区', '小河直街'],
+    'highlights': ['运河支流街巷', '传统民居与沿河空间'],
+    'visitTip': '与拱宸桥、桥西博物馆群顺路，傍晚可保留时间体验沿河街巷。',
+  },
+  'guide-taiziwan': {
+    'address': '杭州市西湖区南山路5-1号', 'transportCost': 18,
+    'mapAliases': ['太子湾公园', '杭州太子湾公园'],
+    'highlights': ['西湖园林景观', '春季花事'],
+    'visitTip': '花季客流与交通管理变化较大，可与苏堤、花港观鱼和雷峰塔步行串联。',
+  },
+  'guide-city-god': {
+    'address': '杭州市上城区吴山3号', 'transportCost': 16,
+    'mapAliases': ['城隍阁', '吴山城隍阁'],
+    'highlights': ['吴山城市观景', '南宋文化陈设'],
+    'visitTip': '可从清河坊步行上吴山，建议根据天气和体力预留登高时间。',
+  },
+}
+
+for _item in [*CURATED_ROUTES, *GUIDE_RECOMMENDATIONS]:
+  _item['sourceName'] = GUIDE_SOURCE['name']
+  _item['sourceUrl'] = GUIDE_SOURCE['url']
+  _item['reviewedOn'] = GUIDE_SOURCE['reviewedOn']
+
+for _item in GUIDE_RECOMMENDATIONS:
+  _details = _GUIDE_PLACE_DETAILS[_item['id']]
+  _item.update(_details)
+  PLACES.append({
+    'id': _item['id'],
+    'name': _item['name'],
+    'city': '杭州',
+    'address': _details['address'],
+    'location': _item['location'],
+    'mapQuery': _item['mapQuery'],
+    'mapAliases': _details['mapAliases'],
+    'mapSourceUrl': f"https://uri.amap.com/search?keyword={_item['mapQuery']}&city=杭州&view=map&src=travel-genui&callnative=0",
+    'indoor': _item['indoor'],
+    'category': _item['category'],
+    'durationMinutes': _item['durationMinutes'],
+    'cost': _item['estimatedCost'],
+    'transportCost': _details['transportCost'],
+    'costEstimated': True,
+    'fictional': False,
+    'ticketPrice': None,
+    'description': _item['description'],
+    'highlights': _details['highlights'],
+    'visitTip': _details['visitTip'],
+    'priceNote': _item['priceNote'],
+    'sourceName': _item['sourceName'],
+    'sourceUrl': _item['sourceUrl'],
+    'contentReviewedOn': GUIDE_SOURCE['reviewedOn'],
+  })

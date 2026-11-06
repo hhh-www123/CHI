@@ -88,7 +88,7 @@ def install_access(app, get_store):
             except HTTPException as exc:
                 return JSONResponse({"detail": exc.detail}, status_code=exc.status_code)
         generation = mutation and request.url.path.endswith(("/generate", "/routes", "/repair", "/copy-style", "/edits/candidates"))
-        creation = mutation and request.url.path == "/api/sessions"
+        creation = mutation and request.url.path in {"/api/sessions", "/api/demo-sessions"}
         if creation:
             try:
                 setup = json.loads(getattr(request, "_body", b"{}") or b"{}")

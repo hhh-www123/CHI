@@ -298,7 +298,7 @@ class CandidateAPITests(unittest.TestCase):
         with patch.object(candidate_agent.httpx, "Client") as network:
             response = self.candidates(agentMode="llm")
         self.assertEqual(response.status_code, 503, response.text)
-        self.assertIn("LLM_API_KEY", response.json()["detail"]["message"])
+        self.assertIn("服务接入", response.json()["detail"]["message"])
         network.assert_not_called(); self.assert_unchanged(before)
 
     def test_status_exposes_mode_but_never_secret(self):

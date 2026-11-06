@@ -256,19 +256,29 @@ class MapsTests(unittest.TestCase):
                 maps._CACHE.clear()
                 result = maps.enrich_day(day, {"county": place}, "昆山市", "walking")
                 self.assertEqual(result["points"][0]["status"], "unresolved")
-    def test_catalog_only_exposes_verified_real_places_and_estimated_prices(self):
-        from backend.catalog import PLACES as real_places, HOTELS
-        self.assertEqual(15, len(real_places))
-        self.assertEqual(3, len(HOTELS))
+    def test_catalog_exposes_editable_places_and_estimated_prices(self):
+        from backend.catalog import CURATED_ROUTES, GUIDE_RECOMMENDATIONS, PLACES as real_places, HOTELS, PRICING_POLICY
+        self.assertEqual(27, len(real_places))
+        self.assertEqual(12, len(HOTELS))
         for item in [*real_places, *HOTELS]:
-            self.assertTrue(item["livePoiVerified"])
             self.assertFalse(item.get("fictional"))
             self.assertTrue(item["address"])
-            self.assertTrue(item["mapPoiId"])
+            self.assertTrue(item["mapQuery"])
             self.assertTrue(item["sourceUrl"].startswith("https://"))
             self.assertNotIn("lng", item)
             self.assertNotIn("lat", item)
+            if item.get("mapPoiId"):
+                self.assertTrue(item.get("livePoiVerified"))
         self.assertTrue(all(hotel["priceEstimated"] for hotel in HOTELS))
+        self.assertTrue(all(len(place["highlights"]) >= 2 and place["priceNote"] and place["visitTip"] for place in real_places))
+        self.assertTrue(all(len(hotel["nightlyPriceRange"]) == 2 and hotel["nightlyPriceRange"][0] <= hotel["nightlyPrice"] <= hotel["nightlyPriceRange"][1] for hotel in HOTELS))
+        self.assertEqual(PRICING_POLICY["foodPerPersonDay"], 180)
+        verified_ids = {place["id"] for place in real_places}
+        self.assertTrue(CURATED_ROUTES)
+        self.assertTrue(all(set(route["placeIds"]) <= verified_ids for route in CURATED_ROUTES))
+        self.assertEqual(len(GUIDE_RECOMMENDATIONS), 12)
+        self.assertTrue(all("mapPoiId" not in item and item["estimatedCost"] >= 0 for item in GUIDE_RECOMMENDATIONS))
+        self.assertTrue({item["id"] for item in GUIDE_RECOMMENDATIONS} <= verified_ids)
 
 
     def test_short_trip_without_transit_uses_a_real_walking_route(self):

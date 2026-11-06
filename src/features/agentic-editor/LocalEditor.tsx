@@ -6,7 +6,7 @@ import type { DisplayChange } from './historyTypes';
 import type { ComponentBinding, EditorField, EditorScope, PatchPreview } from './types';
 
 export const PERIOD_LABELS = { am: '上午', pm: '下午', evening: '晚上' } as const;
-const FIELD_LABELS = { description: '景点描述', startTime: '开始时间', placeId: '真实景点' } as const;
+const FIELD_LABELS = { description: '景点描述', startTime: '开始时间', placeId: '景点安排' } as const;
 const DEMO_DESCRIPTION = '减少步行，安排一次休息，按自己的节奏游览。';
 
 export function bindingFor(session: Session | null, dayKey: string, stopId?: string, period?: string) {
@@ -61,14 +61,13 @@ interface Props {
   mode: boolean;
   selectedId: string | null;
   busy: boolean;
-  onModeChange: (mode: boolean) => void;
   onSelect: (id: string) => void;
   onLock: (componentId: string, locked: boolean) => void;
   onApply: (previewId: string, baseVersion: number) => Promise<boolean>;
   onDisplay: (componentId: string, change: DisplayChange) => Promise<boolean>;
   onError: (error: unknown) => void;
 }
-export function LocalEditor({ session, mode, selectedId, busy, onModeChange, onSelect, onLock, onApply, onDisplay, onError }: Props) {
+export function LocalEditor({ session, mode, selectedId, busy, onSelect, onLock, onApply, onDisplay, onError }: Props) {
   const previewEpoch = useRef(0);
   const [field, setField] = useState<EditorField>('description');
   const [activityId, setActivityId] = useState('');
@@ -128,16 +127,12 @@ export function LocalEditor({ session, mode, selectedId, busy, onModeChange, onS
   const previewActivity = preview?.document.entities.activities[activityId];
   return <section className="local-editor-panel" aria-label="局部编辑与可信修改范围" data-testid="local-editor-panel">
     <div className="local-editor-heading"><span><MousePointer2 size={16} />局部编辑</span><small>手工 Patch · 可信范围</small></div>
-    <div className="editor-mode-switch" role="group" aria-label="页面浏览编辑模式">
-      <button type="button" aria-pressed={!mode} onClick={() => onModeChange(false)} disabled={busy}>浏览模式</button>
-      <button type="button" aria-pressed={mode} onClick={() => onModeChange(true)} disabled={busy} data-testid="enable-edit-mode">编辑模式</button>
-    </div>
-    <p className="editor-explanation">{mode ? '点击日期区域、时段或景点卡片选中。输入框、下拉框和地图仍可正常使用；也可用 Tab、Enter 选择。' : '浏览时保留原有交互。开启编辑模式后，可以选择并锁定局部组件。'}</p>
+    <p className="editor-explanation">点击日期区域、时段或景点卡片选中。输入框、下拉框和地图仍可正常使用；也可用 Tab、Enter 选择。</p>
     <div className="editor-days" aria-label="日期选区与锁定">{dayBindings.map(item => {
       const locked = !!session.persistedConstraints?.lockedComponentIds.includes(item.componentId);
       const legacyLocked = session.controlState.lockedRegions.includes(item.regionId);
       return <div className="editor-day-row" key={item.componentId}>
-        <button type="button" className={selectedId === item.componentId ? 'is-active' : ''} onClick={() => { onModeChange(true); onSelect(item.componentId); }} disabled={busy} aria-label={'选择' + item.label}>{item.label}</button>
+        <button type="button" className={selectedId === item.componentId ? 'is-active' : ''} onClick={() => onSelect(item.componentId)} disabled={busy} aria-label={'选择' + item.label}>{item.label}</button>
         <button type="button" onClick={() => onLock(item.componentId, !locked)} disabled={busy || pending} aria-label={(locked ? '解锁' : '锁定') + item.label} aria-pressed={locked}>{locked ? <LockKeyhole size={13} /> : <UnlockKeyhole size={13} />}{locked ? '已锁定' : legacyLocked ? '另有生成锁' : '锁定'}</button>
       </div>;
     })}</div>
@@ -146,14 +141,14 @@ export function LocalEditor({ session, mode, selectedId, busy, onModeChange, onS
       <div className="editor-selection-actions"><button className="button secondary" type="button" disabled={busy || pending} onClick={() => onLock(binding.componentId, !ownLock)}>{ownLock ? <UnlockKeyhole size={14} /> : <LockKeyhole size={14} />}{ownLock ? '解除本组件锁定' : '锁定此组件'}</button>{binding.parentId && <button className="button ghost" type="button" onClick={() => onSelect(binding.parentId!)} disabled={busy}>选择上级区域</button>}</div>
       {binding.kind === 'DayCard' ? <section className="editor-display-controls" data-testid="selected-day-display"><h3>所选整日的展示设置</h3><p>仅修改{binding.label}共享的卡片展示；景点、时间、预算与其他日期保持。</p><div><button className="button secondary" type="button" data-testid="display-cards" disabled={busy || pending || isComponentLocked(session, binding.componentId) || session.uiSpec.regions[binding.regionId].view === 'cards'} onClick={() => void onDisplay(binding.componentId, { view: 'cards' })}>卡片展示</button><button className="button secondary" type="button" data-testid="display-timeline" disabled={busy || pending || isComponentLocked(session, binding.componentId) || session.uiSpec.regions[binding.regionId].view === 'timeline'} onClick={() => void onDisplay(binding.componentId, { view: 'timeline' })}>时间轴展示</button><button className="button secondary" type="button" data-testid={session.uiSpec.regions[binding.regionId].compact ? 'expand-selected-day' : 'compact-selected-day'} disabled={busy || pending || isComponentLocked(session, binding.componentId)} onClick={() => void onDisplay(binding.componentId, { compact: !session.uiSpec.regions[binding.regionId].compact })}>{session.uiSpec.regions[binding.regionId].compact ? '显示完整卡片' : '精简卡片信息'}</button></div></section> : <p className="editor-display-hint">卡片风格是整日共享设置；如需修改，请先选择整天，不会从当前子选区扩大权限。</p>}
       <label className="field-label" htmlFor="editor-field">本次选定字段</label>
-      <select id="editor-field" value={field} disabled={pending || busy} onChange={event => { setField(event.target.value as EditorField); setPreview(null); }}><option value="description">景点描述</option><option value="startTime">开始时间</option><option value="placeId">真实景点</option></select>
+      <select id="editor-field" value={field} disabled={pending || busy} onChange={event => { setField(event.target.value as EditorField); setPreview(null); }}><option value="description">景点描述</option><option value="startTime">开始时间</option><option value="placeId">景点安排</option></select>
       {pending && !preview && <p className="editor-status" role="status">正在请求服务端校验…</p>}
       {scopeError && <p className="editor-denied" role="alert">{scopeError}</p>}
       <div className="editor-effective-scope" data-testid="effective-scope"><h3><ShieldCheck size={14} />当前有效修改范围</h3>
         {scope?.allowedPaths.length ? <><p>{scope.label || binding.label} · {FIELD_LABELS[field]}</p><small>{scope.eligibleActivityIds.length} 个活动可作为目标，最终以服务端白名单为准。</small></> : <p>{scope?.blockedReason || '请选择包含活动的未锁定日期、时段或景点卡片；空时段没有可修改活动。'}</p>}
         {scope?.locked && <p className="editor-denied">选区或上级组件已锁定，修改被禁止。</p>}
         {!!scope?.allowedPaths.length && <details><summary>查看服务端字段白名单</summary><ul>{scope.allowedPaths.map(path => <li key={path}><code>{path}</code></li>)}</ul></details>}
-        <p className="editor-protected">保护范围：选区之外、未勾选字段、预算、锁定及内部版本信息。更换地点会同步真实名称；跨时段调整会同步卡片归属。</p>
+        <p className="editor-protected">保护范围：选区之外、未勾选字段、预算、锁定及内部版本信息。更换地点会同步对应名称；跨时段调整会同步卡片归属。</p>
       </div>
       {allowed && <div className="editor-patch-form">
         <label className="field-label" htmlFor="editor-activity">选择要修改的景点</label><select id="editor-activity" value={activityId} disabled={busy || pending} onChange={event => { setActivityId(event.target.value); setPreview(null); }}>{scope!.eligibleActivityIds.map(id => <option value={id} key={id}>{activities[id]?.startTime} · {activities[id]?.title ?? id}</option>)}</select>

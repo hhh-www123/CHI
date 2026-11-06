@@ -135,14 +135,14 @@ def _candidate_rationale(item):
             counts[field] += 1
     facts = []
     if counts["placeId"]:
-        facts.append(f"替换{counts['placeId']}个当前真实目录中的景点")
+        facts.append(f"替换{counts['placeId']}个当前目录中的景点")
     if counts["startTime"]:
         facts.append(f"调整{counts['startTime']}个开始时间")
     if counts["description"]:
         facts.append(f"改写{counts['description']}条景点说明")
     if item["checked"]["derivedChangedPaths"]:
         facts.append("相关地点信息或时段归属由服务端按实际改动自动同步")
-    return "；".join(facts) + "。仅修改选区内获准内容，其他日期和锁定保持；效率策略不代表已核实真实交通距离。"
+    return "；".join(facts) + "。仅修改选区内获准内容，其他日期和锁定保持；效率策略不代表已核实交通距离。"
 
 
 def install_candidate_api(app, host):
@@ -243,7 +243,7 @@ def install_candidate_api(app, host):
                 host.store.proposals.pop(next(iter(host.store.proposals)))
             diagnostics = ["Mock 为确定性规则演示，未调用模型。" if mode == "mock" else "LLM 已通过服务端兼容接口调用；所有候选均由服务端独立审查。",
                            "预览只读；只有点击采用方案后才写入正式行程。",
-                           "效率策略不代表已核实真实交通距离或行驶时间。"]
+                           "效率策略不代表已核实交通距离或行驶时间。"]
             if len(results) < 3:
                 diagnostics.append(f"仅有{len(results)}个合格且有实质差异的候选；受字段范围、时间空间或去重限制，不以非法/重复候选凑数。")
                 missing = set(candidate_agent.STRATEGIES) - {item["strategy"] for item in accepted}

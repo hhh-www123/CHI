@@ -61,7 +61,7 @@ async function reject(name, method, suffix, body, status) { const before = await
 function binding(s, day, kind = 'DayCard', period) { const b = Object.values(s.componentRegistry).find(item => item.dayKey === day && item.kind === kind && (period === undefined || item.period === period)); assert.ok(b, [day, kind, period].join('/')); return b; }
 function pathFor(id, field) { return '/entities/activities/' + id + '/' + field; }
 async function reload() { await page.reload({ waitUntil: 'networkidle' }); await page.getByRole('button', { name: '继续上次行程', exact: true }).click(); await page.getByRole('tabpanel').waitFor(); }
-async function selectDay(day) { const b = binding(await current(), day); await page.getByTestId('local-editor-panel').getByRole('button', { name: '选择' + b.label, exact: true }).click(); }
+async function selectDay(day) { const b = binding(await current(), day); if (await page.getByTestId('edit-mode-toggle').getAttribute('aria-pressed') !== 'true') await page.getByTestId('edit-mode-toggle').click(); await page.getByTestId('local-editor-panel').getByRole('button', { name: '选择' + b.label, exact: true }).click(); }
 async function selectPeriod(day, period) { await selectDay(day); await page.getByTestId('editor-period-' + period).click(); await page.locator('#editor-activity').waitFor(); }
 async function manual(field, activityId, value, expectedStatus = 200) { await page.locator('#editor-field').selectOption(field); await page.locator('#editor-activity').selectOption(activityId); if (field === 'placeId') await page.locator('#editor-value').selectOption(value); else await page.locator('#editor-value').fill(value); return action('POST', '/editor/preview', () => page.getByTestId('validate-local-patch').click(), expectedStatus); }
 async function generated(instruction) { await page.locator('#instruction').fill(instruction); const b = await action('POST', '/edits/candidates', () => page.getByTestId('generate-edit-candidates').click()); await page.getByTestId('phase2-candidates').waitFor(); return b; }
@@ -84,7 +84,7 @@ async function screenshot(name, targetTestId) {
     page = await context.newPage(); page.setDefaultTimeout(20000);
     page.on('pageerror', e => errors.push(e.message)); page.on('request', r => { if (!['127.0.0.1', 'localhost'].includes(new URL(r.url()).hostname)) external.push(new URL(r.url()).origin); });
     await page.goto(base, { waitUntil: 'networkidle' });
-    let session = await action('POST', '/api/sessions', () => page.getByTestId('open-three-day-demo').click()); tripId = session.id;
+    let session = await action('POST', '/api/demo-sessions', () => page.getByTestId('open-three-day-demo').click()); tripId = session.id;
     const idsAtStart = Object.keys(session.componentRegistry).sort();
     const firstMorning = binding(session, 'day1', 'ActivityCard', 'am');
     await selectPeriod('day1', 'am');
@@ -186,7 +186,7 @@ async function screenshot(name, targetTestId) {
     record('Manual Patch replaces a real catalog place; its title is server-derived and stable IDs are preserved');
 
     const placeBatchBefore = await current(), placeBatchRow = stored();
-    await page.locator('.phase2-fields').getByRole('checkbox', { name: '真实景点', exact: true }).check();
+    await page.locator('.phase2-fields').getByRole('checkbox', { name: '景点安排', exact: true }).check();
     batch = await generated('换个景点'); assert.equal(batch.candidateCount, 3);
     const catalogIds = new Set(session.catalog.places.map(p => p.id));
     assert.equal(new Set(batch.candidates.map(c => c.document.entities.activities[secondCard.entityId].placeId)).size, 3);
@@ -214,13 +214,17 @@ async function screenshot(name, targetTestId) {
 
     // Keep map regression independent of the locked activity and without real keys.
     await selectDay('day3');
-    const mapSession = await action('POST', '/routes', () => page.getByTestId('refresh-day-routes').click());
-    assert.equal(mapSession.routeData['day-3'].status, 'unconfigured'); await page.locator('.map-unavailable').waitFor();
+    const beforeMapPrompt = await current(), beforeMapPromptRow = stored();
+    await page.getByTestId('refresh-day-routes').click();
+    const mapSettings = page.getByRole('dialog', { name: '服务接入', exact: true }); await mapSettings.waitFor();
+    assert.ok(await mapSettings.getByTestId('amap-integration-form').evaluate(node => node.classList.contains('is-target')));
+    await unchanged(beforeMapPrompt, beforeMapPromptRow);
+    await mapSettings.getByRole('button', { name: '关闭服务接入', exact: true }).click();
     await page.locator('a.nav-link').click(); await page.getByRole('button', { name: '操作记录', exact: true }).click(); await page.getByTestId('version-history').waitFor(); await page.getByRole('button', { name: '关闭操作记录', exact: true }).click();
     assert.equal(await page.locator('iframe').count(), 0); const metrics = await page.evaluate(() => ({ width: document.documentElement.scrollWidth, viewport: innerWidth })); assert.ok(metrics.width <= metrics.viewport + 1);
     await page.setViewportSize({ width: 390, height: 844 }); await page.getByRole('button', { name: '查看操作记录', exact: true }).click(); await page.getByTestId('version-history').waitFor(); while (await page.getByRole('button', { name: '关闭提示', exact: true }).count()) await page.getByRole('button', { name: '关闭提示', exact: true }).first().click(); await page.screenshot({ path: path.join(shots, 'mobile-history.png'), animations: 'disabled' });
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)); assert.deepEqual(errors, []); assert.deepEqual(external, []);
-    record('Original map fallback, navigation and persistent history remain usable on desktop and mobile');
+    record('Missing map API opens service settings without mutation; navigation and persistent history remain usable on desktop and mobile');
     fs.writeFileSync(path.join(reports, suite+'-browser.json'), JSON.stringify({ passed: true, version: live.version, serverRevision: live.serverRevision, runId, tripId, baseURL: base, databaseIsolation: path.relative(root, dataDir).replace(/\\/g, '/'), realModel: false, realMap: false, browserErrors: errors, externalRequests: external, results, changes, rejections, screenshots: ['first-morning-candidates.png', 'third-evening-candidates.png', 'real-place-candidates.png', 'mobile-history.png'].map(n => 'docs/screenshots/edit-scope/' + n) }, null, 2));
     console.log('RESULT ' + JSON.stringify({ passed: true, checks: results.length, browserErrors: errors, externalRequests: external }));
   } catch (error) {

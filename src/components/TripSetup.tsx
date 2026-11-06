@@ -9,13 +9,14 @@ interface Props {
   error: string;
   onSubmit: (settings: TripSetupRequest) => void;
   onContinue: () => void;
-  onDemo: () => void;
+  onDemo: (settings: TripSetupRequest) => void;
+  onNeedModel: () => void;
   onAbort: () => void;
 }
 const today = () => new Date(Date.now() + 8 * 3600000).toISOString().slice(0, 10);
 const cities = ['北京', '上海', '杭州', '成都', '西安', '南京', '广州', '厦门'];
 
-export function TripSetup({ status, previous, busy, error, onSubmit, onContinue, onDemo, onAbort }: Props) {
+export function TripSetup({ status, previous, busy, error, onSubmit, onContinue, onDemo, onNeedModel, onAbort }: Props) {
   const [settings, setSettings] = useState<TripSetupRequest>({ city: '', dayCount: 3, budgetLimit: 3000, startDate: today(), travelers: 1, preferences: '' });
   const [seconds, setSeconds] = useState(0);
   useEffect(() => {
@@ -28,10 +29,17 @@ export function TripSetup({ status, previous, busy, error, onSubmit, onContinue,
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!settings.city.trim() || busy) return;
+    if (!status?.configured) { onNeedModel(); return; }
     onSubmit({ ...settings, city: settings.city.trim(), preferences: settings.preferences.trim() });
   };
+  const openGeneratedDemo = () => {
+    if (busy) return;
+    const demoSettings = { ...settings, city: '杭州', preferences: settings.preferences.trim() };
+    setSettings(demoSettings);
+    onDemo(demoSettings);
+  };
   return <section className="trip-setup" data-testid="trip-setup" aria-label="规划新的旅行">
-    <div className="trip-setup-intro"><span className="setup-eyebrow"><Compass size={17} />YOUR NEXT JOURNEY</span><h1>下一站，<span>由你决定。</span></h1><p>选好目的地与出行安排，让 Agent 为你规划行程。<br />从真实地点出发，再慢慢调整成喜欢的样子。</p><div className="setup-principles"><span><MapPin size={17} />真实景点与酒店</span><span><Sparkles size={17} />可修改的行程与界面</span><span><Wallet size={17} />按总预算规划</span></div>
+    <div className="trip-setup-intro"><span className="setup-eyebrow"><Compass size={17} />YOUR NEXT JOURNEY</span><h1>下一站，<span>由你决定。</span></h1><p>选好目的地与出行安排，让 Agent 为你规划行程。<br />从地点目录出发，再慢慢调整成喜欢的样子。</p><div className="setup-principles"><span><MapPin size={17} />景点与酒店</span><span><Sparkles size={17} />可修改的行程与界面</span><span><Wallet size={17} />按总预算规划</span></div>
     {previous && <div className="previous-trip" data-testid="previous-trip"><span>上次保存的旅行</span><strong>{previous.tripState.city} · {Object.keys(previous.tripState.days).length} 天</strong><p>已应用的页面和行程仍保留，可以继续使用。</p><button className="button secondary" type="button" disabled={busy} onClick={onContinue}>继续上次行程<ArrowRight size={15} /></button></div>}
     </div>
     <form className="trip-setup-form" onSubmit={submit} aria-label="行程规划参数">
@@ -40,11 +48,11 @@ export function TripSetup({ status, previous, busy, error, onSubmit, onContinue,
       <div className="setup-field-grid"><div className="setup-field"><label htmlFor="setup-start-date"><CalendarDays size={15} />出发日期</label><input id="setup-start-date" name="startDate" type="date" required value={settings.startDate} onChange={event => update('startDate', event.target.value)} /></div><div className="setup-field"><label htmlFor="setup-day-count">旅游天数</label><input id="setup-day-count" name="dayCount" type="number" inputMode="numeric" min={1} max={14} step={1} required value={settings.dayCount || ''} onChange={event => update('dayCount', Number(event.target.value))} /><small>支持 1–14 天</small></div><div className="setup-field"><label htmlFor="setup-budget"><Wallet size={15} />全程总预算（元）</label><input id="setup-budget" name="budgetLimit" type="number" inputMode="numeric" min={100} max={100000} step={1} required value={settings.budgetLimit || ''} onChange={event => update('budgetLimit', Number(event.target.value))} /></div><div className="setup-field"><label htmlFor="setup-travelers"><Users size={15} />同行人数</label><input id="setup-travelers" name="travelers" type="number" inputMode="numeric" min={1} max={10} step={1} required value={settings.travelers || ''} onChange={event => update('travelers', Number(event.target.value))} /></div></div>
       <div className="setup-field"><label htmlFor="setup-preferences">偏好与补充要求 <span>选填</span></label><textarea id="setup-preferences" name="preferences" rows={3} maxLength={1000} placeholder="例如：喜欢历史与美食，节奏轻松，少爬山" value={settings.preferences} onChange={event => update('preferences', event.target.value)} /></div></fieldset>
       {error && <p className="setup-error" role="alert">{error}</p>}
-      {status?.mode === 'llm' && !status.configured && <p className="setup-service-note">模型服务尚未配置，请由维护者在后台填写 API 配置后再规划。</p>}
+      {!status?.configured && <p className="setup-service-note">模型 API 尚未接入。点击“开始规划行程”会打开服务接入，也可以先生成杭州示例。</p>}
       <button type="submit" className="button primary setup-submit" disabled={busy || !settings.city.trim()} data-testid="plan-trip">{busy ? <LoaderCircle className="spin" size={17} /> : <Sparkles size={17} />}{busy ? `正在规划行程 · ${seconds} 秒` : '开始规划行程'}<ArrowRight size={16} /></button>
-      {busy && <div className="setup-planning-progress" role="status"><p>正在查找真实地点并安排每日行程，请稍候。</p><button type="button" onClick={onAbort}>停止等待</button></div>}
-      <button type="button" className="button secondary setup-demo-button" onClick={onDemo} disabled={busy} data-testid="open-three-day-demo">打开三日演示（不调用模型）</button>
-      <p className="setup-footnote">支持地图服务覆盖的中国城市。景点与酒店来自真实地点信息，门票、交通和住宿金额为预算估算；实时价格与可预订情况以服务方为准。</p>
+      {busy && <div className="setup-planning-progress" role="status"><p>正在查找地点并安排每日行程，请稍候。</p><button type="button" onClick={onAbort}>停止等待</button></div>}
+      <button type="button" className="button secondary setup-demo-button" onClick={openGeneratedDemo} disabled={busy} data-testid="open-three-day-demo">按当前条件生成杭州示例（不调用模型）</button>
+      <p className="setup-footnote">支持地图服务覆盖的中国城市。门票、交通和住宿金额为预算估算；实时价格与可预订情况以服务方为准。</p>
     </form>
   </section>;
 }
