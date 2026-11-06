@@ -1,0 +1,129 @@
+{
+  "schemaVersion": "1.0",
+  "analysisId": "travel-long-horizon-primary-v1",
+  "status": "frozen",
+  "frozenAt": "2026-11-06",
+  "freezeDecision": "research/open-decisions.md#11",
+  "freezeRequiredBeforeMethodUnblinding": true,
+  "scope": "Study 1 automatic A-D experiment in the structured travel-editing prototype",
+  "design": {
+    "methods": ["A", "B", "C", "D"],
+    "interactionLengths": [1, 5, 10, 20],
+    "trialsPerCell": 5,
+    "modelIdentityCount": 2,
+    "taskTemplateCount": 6,
+    "taskTemplates": [
+      "retention-budget-hotel",
+      "implicit-indoor-preference",
+      "restore-before-place-change",
+      "self-coherence-budget",
+      "budget-goal-update",
+      "locked-day-conflict"
+    ],
+    "expectedBlocks": 240,
+    "expectedEpisodes": 960,
+    "analysisPopulation": "all scheduled episodes (intention-to-treat)",
+    "modelIdentityPolicy": "fit and report each frozen model identity separately; pooled estimates are exploratory only"
+  },
+  "confirmatory": {
+    "primaryEndpoint": {
+      "id": "episode_task_success",
+      "source": "episodes[].success",
+      "type": "binary",
+      "successDefinition": "every round satisfies its immediate goal, tested active goals and active constraints; no retired goal leaks; no semantic or technical failure; and no unauthorized changed path",
+      "failurePolicy": "timeouts, invalid output, guard rejection, state rejection, version conflict and other registered technical failures remain failures",
+      "targetInteractionLength": 20,
+      "direction": "higher is better"
+    },
+    "primaryContrasts": ["D-A", "D-B", "D-C"],
+    "alpha": 0.05,
+    "confidenceLevel": 0.95,
+    "multiplicity": {
+      "method": "Holm",
+      "family": "the three D-versus-A/B/C contrasts at length 20, separately within each model identity",
+      "twoSided": true
+    },
+    "replicationRule": "Do not pool the two model identities for a confirmatory claim. Report both adjusted contrast families; call an effect replicated only when both point estimates have the same direction and both Holm-adjusted tests meet alpha. Otherwise report heterogeneity or non-replication."
+  },
+  "model": {
+    "engine": "lme4::glmer",
+    "family": "binomial(link='logit')",
+    "formulaR": "success ~ method * interaction_length + execution_position + (1 | template_id) + (1 | block_id)",
+    "methodLevels": ["A", "B", "C", "D"],
+    "lengthLevels": ["1", "5", "10", "20"],
+    "executionPositionLevels": ["1", "2", "3", "4"],
+    "categoricalLength": true,
+    "randomEffects": [
+      "task-template random intercept",
+      "randomized model-by-task-by-length-by-trial block intercept"
+    ],
+    "integration": "Laplace (nAGQ=1)",
+    "optimizer": "bobyqa",
+    "maxfun": 200000,
+    "effectMeasures": [
+      "conditional odds ratio with Wald 95% CI",
+      "model-adjusted probability difference with Wald 95% CI"
+    ]
+  },
+  "sensitivityAnalyses": [
+    "replace the six-level template random intercept with template fixed effects while retaining the block random intercept",
+    "task-template paired exact sign-flip tests and task-template bootstrap intervals",
+    "report the method-by-length likelihood-ratio test without treating it as a substitute primary endpoint",
+    "fit a pooled model-identity interaction only as an exploratory heterogeneity analysis"
+  ],
+  "diagnostics": {
+    "required": [
+      "optimizer convergence messages",
+      "maximum absolute scaled gradient when available",
+      "singular-fit flag and random-effect variances",
+      "outcome counts by model, method and length",
+      "complete or quasi-separation warning",
+      "all denominators and registered technical-failure counts"
+    ],
+    "failureRule": "If the primary model does not converge or is non-estimable, retain the data and report the diagnostic failure. Do not simplify the endpoint, delete failures or promote a sensitivity analysis after seeing results."
+  },
+  "missingData": {
+    "episodeOutcome": "must be present; missing required human labels block dataset assembly rather than being imputed",
+    "technicalFailure": "coded as primary-endpoint failure, not missing",
+    "providerWideInterruption": "handled only by the preregistered whole-block rerun rule before analysis",
+    "exclusions": "none beyond invalid provenance or a preregistered provider-wide interrupted block"
+  },
+  "secondaryEndpoints": [
+    {
+      "id": "goal_retention_auc",
+      "role": "key secondary",
+      "analysis": "template-grouped estimates and sensitivity mixed model; goal-update episodes are structurally ineligible and excluded from this endpoint only"
+    },
+    {
+      "id": "episode_unauthorized_change",
+      "role": "safety secondary",
+      "analysis": "raw numerator/denominator and task-template robust intervals; structural zeros or separation are reported rather than concealed"
+    },
+    {
+      "id": "first_drift_round",
+      "role": "secondary",
+      "analysis": "Kaplan-Meier curves with template-grouped uncertainty"
+    }
+  ],
+  "runtime": {
+    "status": "frozen-tested",
+    "language": "R",
+    "requiredPackages": ["lme4", "emmeans", "jsonlite", "digest"],
+    "verifiedVersions": {
+      "R": "4.6.2",
+      "lme4": "2.1.0",
+      "emmeans": "2.0.4",
+      "jsonlite": "2.0.0",
+      "digest": "0.6.39"
+    },
+    "lockedVersions": {
+      "R": "4.6.2",
+      "lme4": "2.1.0",
+      "emmeans": "2.0.4",
+      "jsonlite": "2.0.0",
+      "digest": "0.6.39"
+    },
+    "verificationEvidence": "analysis/runtime-verification.json",
+    "lockRequirement": "record R and package versions and run the synthetic contract test before changing status to frozen-tested"
+  }
+}

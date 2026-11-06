@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "mixed-effects-runtime-verification-1.0",
+  "status": "passed",
+  "verifiedAt": "2026-11-06T01:29:48.333738+00:00",
+  "syntheticContractTest": true,
+  "formalAnalysisReady": false,
+  "modelFitsReady": true,
+  "design": {
+    "episodes": 960,
+    "blocks": 240,
+    "modelCount": 2,
+    "templateCount": 6,
+    "methods": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "interactionLengths": [
+      1,
+      5,
+      10,
+      20
+    ],
+    "trialsPerCell": 5
+  },
+  "runtimeVersions": {
+    "R": "4.6.2",
+    "lme4": "2.1.0",
+    "emmeans": "2.0.4",
+    "jsonlite": "2.0.0",
+    "digest": "0.6.39"
+  },
+  "platform": [
+    "R version 4.6.2 (2026-10-29)",
+    "Platform: aarch64-apple-darwin27.0.0",
+    "Running under: macOS Golden Gate 27.0"
+  ],
+  "assetHashes": {
+    "modelSpec": "5807287761be77040c2829adb84a517f99715c6247d1d9d8e053f05d996e38c6",
+    "preparationScript": "d12b55c4e0a7ae8436d09efa57a36964cfb81ad2e1397366226518a46c55dc8a",
+    "modelScript": "8c00c25244cf88a647c17151dc158d72c64036f90782c1112ead4cc46c148d94",
+    "fixtureGenerator": "b427ab596316b441adcc4ccbf4ae8116f8c6bedd2911fd8ffe7d5449808e8329",
+    "verificationScript": "45e2f705d22562319eade59ac90780d808a87f8ade3eb0e7afd79c98c10f44d6"
+  },
+  "modelSpecCanonicalHash": "ead78afdc2d97938d7fa5abbd0074ecfd6b851972a42ea005235955dc39d8533",
+  "analysisContractHash": "24b7080f3f2eda04bb517652a2d867219c53035ede1e81fb86693c888b7c1263",
+  "preparedEpisodesSha256": "5e8f5b4a04b5d8fcb7d9a87d22b6e48914c387c0efb112053ae2a4807b61adee",
+  "models": {
+    "synthetic-primary": {
+      "estimable": true,
+      "confirmatoryInferenceReady": true,
+      "primaryDiagnostics": {
+        "optimizerCode": 0,
+        "singular": false,
+        "maxAbsoluteGradient": 0,
+        "warningCount": 0,
+        "convergenceMessageCount": 0
+      },
+      "templateFixedEffectSensitivityEstimable": true
+    },
+    "synthetic-replication": {
+      "estimable": true,
+      "confirmatoryInferenceReady": true,
+      "primaryDiagnostics": {
+        "optimizerCode": 0,
+        "singular": false,
+        "maxAbsoluteGradient": 7.3015e-06,
+        "warningCount": 0,
+        "convergenceMessageCount": 0
+      },
+      "templateFixedEffectSensitivityEstimable": true
+    }
+  },
+  "note": "Synthetic contract evidence only; it is not a formal experiment or an empirical result."
+}

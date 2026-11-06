@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0",
+  "status": "draft-unfrozen",
+  "sharedInputs": [
+    "same initial fixture",
+    "same complete conversation history",
+    "same normalized current document",
+    "same model and sampling configuration",
+    "same map/catalog condition"
+  ],
+  "methods": [
+    {
+      "id": "A",
+      "label": "whole-document generation",
+      "outputContract": "complete_trip_document",
+      "preservationPrompt": false,
+      "pathAllowlist": false,
+      "persistentLocks": false,
+      "invariantValidation": false,
+      "optimisticVersion": false,
+      "candidateCount": 1,
+      "explicitCommit": false,
+      "formalRunnable": true,
+      "implementationStatus": "prompt/parser/model client/state executor, 24-condition contract pilot, and gated resumable formal runner ready"
+    },
+    {
+      "id": "B",
+      "label": "whole-document generation plus preservation prompt",
+      "outputContract": "complete_trip_document",
+      "preservationPrompt": true,
+      "pathAllowlist": false,
+      "persistentLocks": false,
+      "invariantValidation": false,
+      "optimisticVersion": false,
+      "candidateCount": 1,
+      "explicitCommit": false,
+      "formalRunnable": true,
+      "implementationStatus": "prompt/parser/model client/state executor, 24-condition contract pilot, and gated resumable formal runner ready"
+    },
+    {
+      "id": "C",
+      "label": "single local patch with path allowlist",
+      "outputContract": "restricted_json_patch",
+      "preservationPrompt": false,
+      "pathAllowlist": true,
+      "persistentLocks": false,
+      "invariantValidation": false,
+      "optimisticVersion": false,
+      "candidateCount": 1,
+      "explicitCommit": false,
+      "formalRunnable": true,
+      "implementationStatus": "prompt/parser/model client/allowlisted executor, 24-condition contract pilot, and gated resumable formal runner ready"
+    },
+    {
+      "id": "D",
+      "label": "guarded local patch with versioned candidate confirmation",
+      "outputContract": "restricted_json_patch_candidates",
+      "preservationPrompt": false,
+      "pathAllowlist": true,
+      "persistentLocks": true,
+      "invariantValidation": true,
+      "optimisticVersion": true,
+      "candidateCount": 3,
+      "explicitCommit": true,
+      "formalRunnable": true,
+      "implementationStatus": "artifact, prompt/parser/model client/guarded executor, 24-condition full-history contract pilot, and gated resumable formal runner ready"
+    }
+  ],
+  "fairnessRules": [
+    "A and B may replace data only inside an isolated experiment copy and never execute generated code.",
+    "All methods receive the same history and current state; method-specific instructions describe only the output contract and guards.",
+    "Invalid JSON, timeout, guard rejection and no-op are recorded as outcomes and never replaced by Mock output.",
+    "Retries, if enabled before freezing, use the same fixed limit for all methods and are included in latency and cost.",
+    "The evaluator and semantic annotators do not see the system ranking when assigning ground truth labels."
+  ]
+}

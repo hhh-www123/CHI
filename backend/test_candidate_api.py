@@ -278,6 +278,21 @@ class CandidateAPITests(unittest.TestCase):
         self.assertEqual(batch["candidateCount"], 1)
         self.assertTrue(all(op["path"].endswith("/description") for c in batch["candidates"] for op in c["patch"]))
 
+    def test_mock_place_replacement_can_preserve_time(self):
+        before_times = {
+            activity_id: activity["startTime"]
+            for activity_id, activity in self.session["tripDocument"]["entities"]["activities"].items()
+        }
+        batch = self.batch(instruction="换个景点，保留时间和其他内容", fields=["placeId"])
+        self.assertEqual(batch["candidateCount"], 3)
+        self.assertTrue(all(op["path"].endswith("/placeId") for c in batch["candidates"] for op in c["patch"]))
+        for candidate in batch["candidates"]:
+            after_times = {
+                activity_id: activity["startTime"]
+                for activity_id, activity in candidate["document"]["entities"]["activities"].items()
+            }
+            self.assertEqual(after_times, before_times)
+
     def test_missing_llm_key_explains_configuration_and_never_calls_network(self):
         before = self.stored()
         with patch.object(candidate_agent.httpx, "Client") as network:

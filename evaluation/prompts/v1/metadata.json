@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "1.0",
+  "version": "v1-draft",
+  "status": "draft",
+  "language": "zh-CN",
+  "files": ["common.txt", "A.txt", "B.txt", "C.txt", "D.txt"],
+  "notes": "Freeze only after adapter conformance tests and a task-blind pilot. Prompt changes after freezing require a new version."
+}

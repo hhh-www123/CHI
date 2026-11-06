@@ -7,7 +7,9 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1 --port 5174 --strictPort",
     "build": "tsc --noEmit && vite build",
-    "preview": "vite preview --host 127.0.0.1 --port 5174 --strictPort"
+    "preview": "vite preview --host 127.0.0.1 --port 5174 --strictPort",
+    "test:evaluation": "node tests/evaluation-metrics.cjs && node tests/research-assets.cjs",
+    "test:research": "node tests/research-assets.cjs"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

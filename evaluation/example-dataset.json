@@ -1,0 +1,85 @@
+{
+  "schemaVersion": "1.0",
+  "illustrative": true,
+  "note": "This file only demonstrates the scoring contract. It is not an experiment result.",
+  "episodes": [
+    {
+      "method": "D",
+      "modelKey": "illustrative-model",
+      "taskId": "example-retention",
+      "trial": 1,
+      "success": true,
+      "rounds": [
+        {
+          "round": 1,
+          "activeGoals": [
+            {"id": "budget-cap", "introducedRound": 1, "weight": 2, "satisfied": true}
+          ],
+          "retiredGoals": [],
+          "activeConstraints": [
+            {"id": "time-order", "introducedRound": 1, "satisfied": true}
+          ],
+          "desiredPaths": ["/tripState/budgetLimit"],
+          "actualChangedPaths": ["/tripState/budgetLimit"],
+          "unauthorizedChangedPaths": [],
+          "latencyMs": 1000,
+          "inputTokens": 800,
+          "outputTokens": 200,
+          "apiCostUsd": 0.001
+        }
+      ]
+    },
+    {
+      "method": "D",
+      "modelKey": "illustrative-model",
+      "taskId": "example-retention",
+      "trial": 2,
+      "success": true,
+      "rounds": [
+        {
+          "round": 1,
+          "activeGoals": [
+            {"id": "budget-cap", "introducedRound": 1, "weight": 2, "satisfied": true}
+          ],
+          "retiredGoals": [],
+          "activeConstraints": [
+            {"id": "time-order", "introducedRound": 1, "satisfied": true}
+          ],
+          "desiredPaths": ["/tripState/budgetLimit"],
+          "actualChangedPaths": ["/tripState/budgetLimit"],
+          "unauthorizedChangedPaths": [],
+          "latencyMs": 1100,
+          "inputTokens": 820,
+          "outputTokens": 210,
+          "apiCostUsd": 0.0011
+        }
+      ]
+    },
+    {
+      "method": "D",
+      "modelKey": "illustrative-model",
+      "taskId": "example-retention",
+      "trial": 3,
+      "success": false,
+      "rounds": [
+        {
+          "round": 1,
+          "activeGoals": [
+            {"id": "budget-cap", "introducedRound": 1, "weight": 2, "satisfied": false}
+          ],
+          "retiredGoals": [],
+          "activeConstraints": [
+            {"id": "time-order", "introducedRound": 1, "satisfied": true}
+          ],
+          "desiredPaths": ["/tripState/budgetLimit"],
+          "actualChangedPaths": [],
+          "unauthorizedChangedPaths": [],
+          "latencyMs": 900,
+          "inputTokens": 780,
+          "outputTokens": 150,
+          "apiCostUsd": 0.0009
+        }
+      ]
+    }
+  ]
+}

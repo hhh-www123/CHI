@@ -64,6 +64,7 @@ export default function App() {
   const [session, setSession] = useState<Session | null>(null);
   const dayItems = sessionDayItems(session);
   const [showSetup, setShowSetup] = useState(true);
+  const [tripOverviewCollapsed, setTripOverviewCollapsed] = useState(false);
   const [setupError, setSetupError] = useState('');
   const [copyStyleOpen, setCopyStyleOpen] = useState(false);
   const [copyTargets, setCopyTargets] = useState<RegionId[]>([]);
@@ -173,6 +174,18 @@ export default function App() {
     return () => controller.abort();
   }, [reloadKey]);
   useEffect(() => () => { actionController.current?.abort(); timers.current.forEach(clearTimeout); }, []);
+  useEffect(() => {
+    if (loading || connectionError || showSetup || !session) {
+      setTripOverviewCollapsed(false);
+      return;
+    }
+    setTripOverviewCollapsed(false);
+    const timer = setTimeout(() => setTripOverviewCollapsed(true), 1400);
+    return () => clearTimeout(timer);
+  }, [connectionError, loading, session?.id, showSetup]);
+  useEffect(() => {
+    if (editorMode) setTripOverviewCollapsed(true);
+  }, [editorMode]);
   useEffect(() => {
     if (busy !== '正在生成预览') { setGeneratingSeconds(0); return; }
     const startedAt = Date.now();
@@ -565,7 +578,18 @@ export default function App() {
       <div className="topbar-actions">{session && !setupVisible && <button className="button secondary topbar-new-trip" aria-label="规划新行程" onClick={openTripSetup} disabled={!!busy || hasDrafts}><Plus size={16} /><span>新建行程</span></button>}<span className="demo-badge"><span className="status-dot" />{agentConfigured ? `规划服务 · ${agentStatus.provider || 'Agent'}` : agentDemo ? '演示生成 · 未接入模型' : 'Agent 待连接'}</span><button className="button ghost topbar-history" onClick={() => setHistoryOpen(true)} disabled={!session}><History size={16} />操作记录</button><button className="button secondary export-button" onClick={exportPlan} disabled={!session || !!busy}><ArrowDownToLine size={16} />导出计划</button></div>
     </div></header>
     <main className="page-container" id="workspace">{setupVisible ? <TripSetup status={agentStatus} previous={session} busy={busy === '正在规划行程'} error={setupError} onSubmit={settings => void planTrip(settings)} onContinue={() => setShowSetup(false)} onDemo={() => void openDemoTrip()} onAbort={() => actionController.current?.abort()} /> : <>
-      <section className="hero"><div className="hero-copy"><div className="hero-eyebrow"><Leaf size={14} /><span>慢一点，遇见更多风景</span></div><h1>{session?.tripState.city || '你的下一站'}，<span>{dayItems.length ? `${dayItems.length} 天，按你的节奏。` : '从这里出发。'}</span></h1><p>行程随你调整，每一次修改都有迹可循。</p><div className="trip-chips"><span className="chip"><CalendarDays size={14} />{dayItems.length} 天 {displayTrip?.nights ?? 0} 晚</span><span className="chip"><MapPin size={14} />{displayTrip?.city || '目的地待选择'} · {displayTrip?.travelers ?? 1} 人</span><span className="chip"><Wallet size={14} />预算 {money(displayTrip?.budgetLimit ?? 2600)}</span></div></div><div className="hero-art"><ScenicIllustration /><span className="art-caption">A LITTLE ESCAPE, AT YOUR OWN PACE.</span></div></section>
+      <section className={`trip-overview ${tripOverviewCollapsed ? 'is-collapsed' : ''}`} aria-label="行程概览" data-testid="trip-overview">
+        <div className="hero" id="trip-overview-details" aria-hidden={tripOverviewCollapsed}>
+          <div className="hero-copy"><div className="hero-eyebrow"><Leaf size={14} /><span>慢一点，遇见更多风景</span></div><h1>{session?.tripState.city || '你的下一站'}，<span>{dayItems.length ? `${dayItems.length} 天，按你的节奏。` : '从这里出发。'}</span></h1><p>行程随你调整，每一次修改都有迹可循。</p><div className="trip-chips"><span className="chip"><CalendarDays size={14} />{dayItems.length} 天 {displayTrip?.nights ?? 0} 晚</span><span className="chip"><MapPin size={14} />{displayTrip?.city || '目的地待选择'} · {displayTrip?.travelers ?? 1} 人</span><span className="chip"><Wallet size={14} />预算 {money(displayTrip?.budgetLimit ?? 2600)}</span></div></div>
+          <div className="hero-art"><ScenicIllustration /><span className="art-caption">A LITTLE ESCAPE, AT YOUR OWN PACE.</span></div>
+          <button className="hero-collapse-toggle" type="button" aria-controls="trip-overview-details" aria-expanded={!tripOverviewCollapsed} tabIndex={tripOverviewCollapsed ? -1 : 0} onClick={() => setTripOverviewCollapsed(true)} data-testid="trip-overview-collapse"><ChevronDown size={15} />收起概览</button>
+        </div>
+        <button className="hero-compact-toggle" type="button" aria-controls="trip-overview-details" aria-expanded={!tripOverviewCollapsed} aria-hidden={!tripOverviewCollapsed} tabIndex={tripOverviewCollapsed ? 0 : -1} onClick={() => setTripOverviewCollapsed(false)} data-testid="trip-overview-expand">
+          <span className="hero-compact-title"><MapPin size={15} /><strong>{displayTrip?.city || '目的地待选择'}</strong><span>· {dayItems.length} 天，按你的节奏</span></span>
+          <span className="hero-compact-meta"><CalendarDays size={14} />{dayItems.length} 天 {displayTrip?.nights ?? 0} 晚<span aria-hidden="true">·</span><Wallet size={14} />预算 {money(displayTrip?.budgetLimit ?? 2600)}</span>
+          <span className="hero-compact-action">展开概览<ChevronDown size={15} /></span>
+        </button>
+      </section>
 
       {loading ? <section className="connection-state" role="status"><LoaderCircle className="spin" size={30} /><h2>正在打开你的行程</h2><p>载入行程与上次保存的修改…</p></section> : connectionError || !session || !catalog ? <section className="connection-state" role="alert"><RefreshCw size={30} /><h2>暂时没有连接上服务</h2><p>{connectionError || '行程数据载入失败。'}</p><button className="button primary" onClick={() => setReloadKey(value => value + 1)}><RefreshCw size={16} />重新连接</button></section> : <>
       <div className="workspace-grid">

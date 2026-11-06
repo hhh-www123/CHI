@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "status", "blinded", "benchmarkHash", "promptHash", "records"],
+  "properties": {
+    "schemaVersion": {"const": "1.0"},
+    "status": {"enum": ["illustrative", "pilot", "formal"]},
+    "blinded": {"const": true},
+    "benchmarkHash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "promptHash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "records": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/record"}
+    }
+  },
+  "$defs": {
+    "goalLabel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["goalId", "score", "evidence"],
+      "properties": {
+        "goalId": {"type": "string", "minLength": 1},
+        "score": {"type": ["integer", "null"], "enum": [0, 1, 2, null]},
+        "evidence": {"type": "string"}
+      }
+    },
+    "staleGoalLabel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["goalId", "leaked", "evidence"],
+      "properties": {
+        "goalId": {"type": "string", "minLength": 1},
+        "leaked": {"type": ["boolean", "null"]},
+        "evidence": {"type": "string"}
+      }
+    },
+    "candidateLabel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidateId", "relevance", "humanBest", "evidence"],
+      "properties": {
+        "candidateId": {"type": "string", "minLength": 1},
+        "relevance": {"type": ["integer", "null"], "enum": [0, 1, 2, 3, null]},
+        "humanBest": {"type": ["boolean", "null"]},
+        "evidence": {"type": "string"}
+      }
+    },
+    "conflictLabel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["groundTruth", "systemDecision"],
+      "properties": {
+        "groundTruth": {"enum": ["accept", "clarify", "reject", "not_applicable"]},
+        "systemDecision": {"enum": ["accept", "clarify", "reject", "not_applicable"]}
+      }
+    },
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sampleId",
+        "taskId",
+        "round",
+        "annotatorId",
+        "role",
+        "goalLabels",
+        "staleGoalLabels",
+        "candidateLabels",
+        "conflictLabel",
+        "notes"
+      ],
+      "properties": {
+        "sampleId": {"type": "string", "minLength": 8},
+        "taskId": {"type": "string", "minLength": 1},
+        "round": {"type": "integer", "minimum": 1},
+        "annotatorId": {"type": "string", "minLength": 1},
+        "role": {"enum": ["annotator", "adjudicator"]},
+        "goalLabels": {"type": "array", "items": {"$ref": "#/$defs/goalLabel"}},
+        "staleGoalLabels": {"type": "array", "items": {"$ref": "#/$defs/staleGoalLabel"}},
+        "candidateLabels": {"type": "array", "items": {"$ref": "#/$defs/candidateLabel"}},
+        "conflictLabel": {"$ref": "#/$defs/conflictLabel"},
+        "notes": {"type": "string"}
+      }
+    }
+  }
+}

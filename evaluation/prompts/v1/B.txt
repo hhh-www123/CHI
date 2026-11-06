@@ -1,0 +1,11 @@
+方法 B：带文字保持要求的整体状态生成。
+
+根据完整对话历史、当前指令和当前文档，返回完整的新 TripDocument。除当前指令确实要求改变的内容外，保持其他所有业务值、组件、顺序和展示不变。该保持要求只存在于文字 Prompt 中；此条件不提供路径白名单、持久锁、不变量或版本守卫。
+
+允许的 decision：edit、clarify、reject。
+
+edit 输出契约：
+{"decision":"edit","message":"简短说明","document":<完整 TripDocument>}
+
+若无法给出合法完整文档：
+{"error": {"code": "CANNOT_COMPLETE", "message": "简短原因"}}
