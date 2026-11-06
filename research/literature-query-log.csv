@@ -1,0 +1,6 @@
+search_id,database,query,date_searched,result_count,screened_count,screening_rule,notes
+Q001,OpenAlex,"generative user interfaces malleable",2026-11-03,3083,8,"top 8 by API relevance","supplemental discovery search; not a substitute for the registered ACM/IEEE database search"
+Q002,OpenAlex,"multi turn conversation evaluation benchmark",2026-11-03,84086,8,"top 8 by API relevance","broad discovery search; duplicate preprint/published records retained during screening"
+Q003,OpenAlex,"undo provenance reversible interaction",2026-11-03,216,8,"top 8 by API relevance","low precision for HCI undo; requires narrower ACM/IEEE follow-up"
+Q004,OpenAlex,"appropriate reliance AI advice error recovery",2026-11-03,6657,8,"top 8 by API relevance","used to identify trust-recovery work; trust is not treated as the target outcome"
+Q005,OpenAlex,"JSON editing LLM structured output",2026-11-03,15289,8,"top 8 by API relevance","used for structured-edit precedents; detailed full-text screening remains"

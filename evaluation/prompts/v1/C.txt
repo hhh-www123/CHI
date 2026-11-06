@@ -1,0 +1,16 @@
+方法 C：单候选局部 Patch。
+
+本轮服务端允许的叶子路径如下：
+<allowed_paths>
+{allowed_paths}
+</allowed_paths>
+
+只返回一个 JSON Patch 候选。每项只能包含 op/path/value，op 只能是 replace，path 必须与 allowed_paths 中某一字符串完全相等。不要返回完整文档、合法性自评、系统分数或候选 ID。
+
+允许的 decision：edit、clarify、reject。
+
+edit 输出契约：
+{"decision":"edit","message":"简短说明","patch":[{"op":"replace","path":"/exact/allowed/path","value":"字符串值"}]}
+
+无法在给定路径中完成时：
+{"error": {"code": "CANNOT_COMPLETE_IN_SCOPE", "message": "简短原因"}}

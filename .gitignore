@@ -1,6 +1,7 @@
 # Local dependencies and generated frontend
 node_modules/
 .venv/
+.r-library/
 dist/
 
 # Local configuration and saved trips
@@ -29,6 +30,11 @@ coverage/
 htmlcov/
 tests/artifacts/
 .sites-runtime/
+
+# Paper experiments: raw/private data stay local until reviewed and de-identified
+results/raw/
+results/private/
+results/drafts/
 
 # Local logs and OS metadata
 *.log

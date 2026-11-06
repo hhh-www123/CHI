@@ -1,0 +1,217 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/travel-genui/benchmark-schema-1.0.json",
+  "title": "Long-horizon GenUI benchmark templates",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "benchmarkId",
+    "status",
+    "domain",
+    "initialFixture",
+    "lengths",
+    "distractorPool",
+    "templates"
+  ],
+  "properties": {
+    "schemaVersion": {"const": "1.0"},
+    "benchmarkId": {"type": "string", "minLength": 1},
+    "status": {"enum": ["draft", "frozen"]},
+    "domain": {"const": "structured-travel-editing"},
+    "initialFixture": {"type": "string", "minLength": 1},
+    "lengths": {
+      "type": "array",
+      "items": {"enum": [1, 5, 10, 20]},
+      "minItems": 4,
+      "maxItems": 4,
+      "uniqueItems": true
+    },
+    "distractorPool": {
+      "type": "array",
+      "minItems": 18,
+      "items": {"$ref": "#/$defs/roundTemplate"}
+    },
+    "templates": {
+      "type": "array",
+      "minItems": 6,
+      "items": {"$ref": "#/$defs/taskTemplate"}
+    }
+  },
+  "$defs": {
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": {"enum": ["activity", "day", "global", "version", "conversation"]},
+        "dayKey": {"type": "string"},
+        "stopId": {"type": "string"},
+        "component": {"type": "string"}
+      }
+    },
+    "roundTemplate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "instruction", "target", "fields", "expectedBehavior", "candidateTargetCount"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "instruction": {"type": "string", "minLength": 1},
+        "target": {"$ref": "#/$defs/target"},
+        "fields": {
+          "type": "array",
+          "items": {"enum": ["description", "startTime", "placeId", "presentation", "none"]},
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "expectedBehavior": {"enum": ["edit", "explain", "clarify", "reject", "restore", "update_goal"]},
+        "candidateTargetCount": {"type": ["integer", "null"], "minimum": 1, "maximum": 3}
+      }
+    },
+    "stateAssertion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "operator"],
+      "properties": {
+        "path": {"type": "string", "pattern": "^/"},
+        "operator": {"enum": ["equals", "not_equals", "unchanged", "less_or_equal", "active", "inactive", "catalog_property"]},
+        "value": {},
+        "property": {"type": "string"}
+      }
+    },
+    "goal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "weight", "introducedBy", "activeThrough", "semanticRubric"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["hard_constraint", "preference", "version_reference", "self_coherence", "goal_update", "conflict_handling"]},
+        "weight": {"type": "number", "exclusiveMinimum": 0},
+        "introducedBy": {"enum": ["setup", "probe", "combined"]},
+        "activeThrough": {"enum": ["probe", "end", "replaced_at_probe"]},
+        "semanticRubric": {"type": "string", "minLength": 1},
+        "stateAssertions": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/stateAssertion"}
+        },
+        "retirementAssertions": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/stateAssertion"}
+        }
+      }
+    },
+    "oracle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["taskSuccessRubric", "probeExpectedBehavior", "stateAssertions"],
+      "properties": {
+        "taskSuccessRubric": {"type": "string", "minLength": 1},
+        "probeExpectedBehavior": {"enum": ["edit", "clarify", "reject", "restore", "update_goal"]},
+        "stateAssertions": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/stateAssertion"}
+        }
+      }
+    },
+    "trustedSetupAction": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "value"],
+          "properties": {
+            "kind": {"const": "set_max_budget"},
+            "value": {"type": "number", "minimum": 100, "maximum": 100000}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind"],
+          "properties": {"kind": {"const": "lock_hotel"}}
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "dayKey"],
+          "properties": {
+            "kind": {"const": "lock_day"},
+            "dayKey": {"type": "string", "pattern": "^day(?:[1-9]|1[0-4])$"}
+          }
+        }
+      ]
+    },
+    "taskTemplate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "family",
+        "title",
+        "singleTurnInstruction",
+        "setupInstruction",
+        "setupTarget",
+        "setupFields",
+        "setupExpectedBehavior",
+        "setupCandidateTargetCount",
+        "trustedSetupActions",
+        "probeInstruction",
+        "probeTarget",
+        "probeFields",
+        "probeCandidateTargetCount",
+        "distractorIds",
+        "goalLedger",
+        "oracle"
+      ],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "family": {
+          "enum": [
+            "instruction_retention",
+            "implicit_preference",
+            "versioned_editing",
+            "self_coherence",
+            "goal_update",
+            "conflict_handling"
+          ]
+        },
+        "title": {"type": "string", "minLength": 1},
+        "singleTurnInstruction": {"type": "string", "minLength": 1},
+        "setupInstruction": {"type": "string", "minLength": 1},
+        "setupTarget": {"$ref": "#/$defs/target"},
+        "setupFields": {
+          "type": "array",
+          "items": {"enum": ["description", "startTime", "placeId", "presentation", "none"]},
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "setupExpectedBehavior": {"enum": ["edit", "explain", "clarify", "reject", "restore", "update_goal"]},
+        "setupCandidateTargetCount": {"type": ["integer", "null"], "minimum": 1, "maximum": 3},
+        "trustedSetupActions": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/trustedSetupAction"}
+        },
+        "probeInstruction": {"type": "string", "minLength": 1},
+        "probeTarget": {"$ref": "#/$defs/target"},
+        "probeFields": {
+          "type": "array",
+          "items": {"enum": ["description", "startTime", "placeId", "presentation", "none"]},
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "probeCandidateTargetCount": {"type": ["integer", "null"], "minimum": 1, "maximum": 3},
+        "distractorIds": {
+          "type": "array",
+          "minItems": 18,
+          "items": {"type": "string"}
+        },
+        "goalLedger": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/goal"}
+        },
+        "oracle": {"$ref": "#/$defs/oracle"}
+      }
+    }
+  }
+}

@@ -16,11 +16,40 @@
 
 ### 环境要求
 
-- Python 3.12
-- Node.js 24
+- Python 3.12或更高版本（当前已验证3.14.7）
+- Node.js 24或更高版本（当前已验证26.8.1）
 - pnpm 11.25.0
 
 下载本仓库并解压，或使用Git克隆。在包含 `package.json` 和 `backend/` 的项目根目录打开终端。以下命令均相对于项目根目录，不需要修改为某台电脑的固定路径。
+
+### 当前可运行状态
+
+2026-11-06 已实际验证以下路径：前端生产构建成功；服务以无密钥演示模式监听 `127.0.0.1:8011`；`/api/health`、首页和 `/api/agent/status` 均返回 HTTP 200。正式论文模型实验当前按计划跳过，不影响本地产品演示、Mock候选、保存恢复、评测工具和研究资产检查。
+
+依赖已经安装时，macOS / Linux使用以下最短命令启动：
+
+```bash
+npm run build
+AGENT_MODE=demo CANDIDATE_AGENT_MODE=mock \
+  .venv/bin/python -m uvicorn backend.app:app --host 127.0.0.1 --port 8011
+```
+
+Windows PowerShell使用：
+
+```powershell
+npm run build
+$env:AGENT_MODE = "demo"
+$env:CANDIDATE_AGENT_MODE = "mock"
+.\.venv\Scripts\python.exe -m uvicorn backend.app:app --host 127.0.0.1 --port 8011
+```
+
+打开 **[http://127.0.0.1:8011/](http://127.0.0.1:8011/)**。另开终端可检查服务：
+
+```bash
+curl -i http://127.0.0.1:8011/api/health
+```
+
+看到 `HTTP/1.1 200 OK` 即表示后端可用。按 `Ctrl+C` 停止服务。只有前端源码发生变化时才需要重新执行构建。依赖安装仍使用锁定的 pnpm；依赖已经存在时，`npm run build` 与 `pnpm build` 执行同一个项目构建脚本。
 
 ### Windows 安装与启动
 
@@ -40,6 +69,8 @@ if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 
 ```powershell
 pnpm build
+$env:AGENT_MODE = "demo"
+$env:CANDIDATE_AGENT_MODE = "mock"
 .\.venv\Scripts\python.exe -m uvicorn backend.app:app --host 127.0.0.1 --port 8011
 ```
 
@@ -54,10 +85,11 @@ npm install --global pnpm@11.25.0
 pnpm install --frozen-lockfile
 [ -f .env ] || cp .env.example .env
 pnpm build
-.venv/bin/python -m uvicorn backend.app:app --host 127.0.0.1 --port 8011
+AGENT_MODE=demo CANDIDATE_AGENT_MODE=mock \
+  .venv/bin/python -m uvicorn backend.app:app --host 127.0.0.1 --port 8011
 ```
 
-首次创建 `.env` 后按下节配置服务。已有配置时请保留原文件。
+上述启动命令使用无密钥演示模式，并会覆盖 `.env` 中的同名模式配置，但不会改写文件。需要真实模型或地图时，再按下节编辑 `.env`；已有配置时请保留原文件。
 
 ## 选择使用方式
 
@@ -191,6 +223,29 @@ pnpm dev
 pnpm build
 ```
 
+### 回归与研究资产检查
+
+以下命令不会调用真实模型或地图服务：
+
+```bash
+# 后端完整回归
+.venv/bin/python -m unittest discover -s backend -p "test_*.py"
+
+# 长程指标与研究资产检查
+pnpm test:evaluation
+
+# 研究就绪状态
+.venv/bin/python research/readiness_audit.py
+```
+
+Windows将 `.venv/bin/python` 替换为 `.venv\Scripts\python.exe`。统计运行时已安装时，可重新执行隔离的960-episode合成合同：
+
+```bash
+.venv/bin/python analysis/verify_runtime.py --output /tmp/runtime-verification-review.json
+```
+
+输出路径必须不存在；该命令只验证分析实现，不产生正式论文结果。
+
 | 目录 | 内容 |
 | --- | --- |
 | `src/` | 前端页面、组件和接口调用 |
@@ -198,6 +253,36 @@ pnpm build
 | `public/` | 静态资源 |
 | `tests/` | 自动化测试 |
 | `scripts/` | 构建与检查脚本 |
+| `evaluation/` | 长程评测指标、示例数据与汇总评分器 |
+
+## 课程评测
+
+长程交互评测不只检查未授权字段，还分别衡量目标完成、目标随轮次衰减、旧目标泄漏、版本指代、重复运行可靠性、恢复成本、候选质量和用户控制。完整定义、A–D对照、任务矩阵、用户实验及统计方法见 [长程评测方案](docs/evaluation.md)。
+
+基础确定性指标已有独立评分器与测试，不调用模型，也不生成实验结论：
+
+```bash
+pnpm test:evaluation
+node evaluation/score.mjs evaluation/example-dataset.json
+node evaluation/score.mjs path/to/dataset.json
+```
+
+隔离 Mock 试跑和正式实验边界见评测方案；试跑不读取真实模型或地图 Key，也不写个人行程数据库。
+
+论文研究协议、24 条件任务集、A–D Prompt 契约、正式运行闸门、可分离映射的盲法标注/评分合并链路和用户研究草案见 [研究资产说明](research/README.md)。研究资产检查运行：
+
+```bash
+pnpm test:research
+.venv/bin/python evaluation/prepare_experiment.py --output /tmp/travel-formal-manifest-draft.json
+```
+
+当前 A–D 执行适配器和可续跑 runner 已完成，分析规范与 R 运行时已经冻结；任务、方法、Prompt 和模型配置仍未冻结，也没有真实实验数据，因此草案 manifest 必须报告 `formalReady: false`。runner 会拒绝草案；不得把工程回归、fixture 或 Mock pilot 写入论文主结果。
+
+正式模型配置目前按研究计划暂缓，`evaluation/models.json` 保持草案占位值。不要运行付费正式实验，也不要把 Mock、示例或合成数据解释为模型效果。
+
+R 4.6.2 与已记录的精确包版本已通过隔离的 960-episode 混合效应合成合同并锁定为 `frozen-tested`；`analysis/runtime-verification.json` 只证明实现和运行时可执行，不构成正式实验或论文结果。
+
+研究级缺口可用 `.venv/bin/python research/readiness_audit.py` 生成机器可读审计。它会把可自动检查的冻结状态与任务双人复核、标注试标、主数据库筛选、统计运行时、伦理和用户 pilot 分开列出，不会用 Mock 或占位模板填补人工证据。
 
 ## 常见问题
 

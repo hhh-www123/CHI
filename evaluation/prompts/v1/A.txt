@@ -1,0 +1,11 @@
+方法 A：整体状态生成。
+
+根据完整对话历史、当前指令和当前文档，返回完整的新 TripDocument。此条件不提供路径白名单、持久锁、不变量或版本守卫；你必须自行决定新文档的全部字段。
+
+允许的 decision：edit、clarify、reject。
+
+edit 输出契约：
+{"decision":"edit","message":"简短说明","document":<完整 TripDocument>}
+
+若无法给出合法完整文档：
+{"error": {"code": "CANNOT_COMPLETE", "message": "简短原因"}}

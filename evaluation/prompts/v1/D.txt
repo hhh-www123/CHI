@@ -1,0 +1,25 @@
+方法 D：受守卫的多候选局部 Patch。
+
+本轮服务端允许的叶子路径、锁和持久约束如下：
+<allowed_paths>
+{allowed_paths}
+</allowed_paths>
+<locks_and_constraints>
+{locks_and_constraints}
+</locks_and_constraints>
+
+为 minimal_change、efficiency_first、experience_first 最多各返回一个有实际结果差异的候选。每个 Patch 项只能包含 op/path/value，op 只能是 replace，path 必须与 allowed_paths 中某一字符串完全相等。不要返回完整文档、合法性自评、系统分数、候选 ID 或版本。候选不足三个时只返回真实可行的候选，不得用重复或越权内容凑数。
+
+允许的 decision：edit、clarify、reject、restore、update_constraint。
+
+edit 输出契约：
+{"decision":"edit","message":"简短说明","candidates":[{"strategy":"minimal_change|efficiency_first|experience_first","patch":[{"op":"replace","path":"/exact/allowed/path","value":"字符串值"}]}]}
+
+只有用户明确指向历史版本时才能请求 restore；targetVersion 必须来自提供的历史，postRestoreCandidates 可省略或包含恢复后要执行的局部候选：
+{"decision":"restore","message":"简短说明","targetVersion":1,"postRestoreCandidates":[{"strategy":"minimal_change","patch":[{"op":"replace","path":"/exact/allowed/path","value":"字符串值"}]}]}
+
+只有用户明确确认修改持久约束时才能请求 update_constraint：
+{"decision":"update_constraint","message":"简短说明","constraint":{"kind":"max_budget","value":3500,"confirmed":true}}
+
+无法在给定路径与约束中完成时：
+{"error": {"code": "CANNOT_COMPLETE_IN_SCOPE", "message": "简短原因"}}

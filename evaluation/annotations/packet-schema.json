@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "generatedAt",
+    "formalExperiment",
+    "blinded",
+    "experimentId",
+    "manifestHash",
+    "analysisContractHash",
+    "benchmarkHash",
+    "benchmarkSourceHash",
+    "promptHash",
+    "catalog",
+    "notes",
+    "sampleCount",
+    "samples"
+  ],
+  "properties": {
+    "schemaVersion": {"const": "blinded-annotations-1.0"},
+    "generatedAt": {"type": "string", "minLength": 1},
+    "formalExperiment": {"const": true},
+    "blinded": {"const": true},
+    "experimentId": {"type": "string", "minLength": 1},
+    "manifestHash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "analysisContractHash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "benchmarkHash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "benchmarkSourceHash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "promptHash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "catalog": {"type": "object"},
+    "notes": {"type": "array", "items": {"type": "string"}},
+    "sampleCount": {"type": "integer", "minimum": 0},
+    "samples": {"type": "array", "items": {"oneOf": [{"$ref": "#/$defs/semanticSample"}, {"$ref": "#/$defs/candidateSample"}]}}
+  },
+  "$defs": {
+    "goal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["goalId", "weight", "semanticRubric", "goalType"],
+      "properties": {
+        "goalId": {"type": "string", "minLength": 1},
+        "weight": {"type": "number", "exclusiveMinimum": 0},
+        "introducedRound": {"type": "integer", "minimum": 1},
+        "semanticRubric": {"type": "string", "minLength": 1},
+        "goalType": {"type": "string", "minLength": 1}
+      }
+    },
+    "retiredGoal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["goalId", "semanticRubric"],
+      "properties": {
+        "goalId": {"type": "string", "minLength": 1},
+        "semanticRubric": {"type": "string", "minLength": 1}
+      }
+    },
+    "expectedLabels": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["goalIds", "staleGoalIds", "candidateIds", "conflictLabel"],
+      "properties": {
+        "goalIds": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "staleGoalIds": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "candidateIds": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "conflictLabel": {"type": "boolean"}
+      }
+    },
+    "baseSampleProperties": {
+      "type": "object",
+      "properties": {
+        "sampleId": {"type": "string", "minLength": 8},
+        "taskId": {"type": "string", "minLength": 1},
+        "round": {"type": "integer", "minimum": 1},
+        "phase": {"type": "string", "minLength": 1},
+        "instruction": {"type": "string", "minLength": 1},
+        "contextGoals": {"type": "array", "items": {"$ref": "#/$defs/goal"}},
+        "candidateTargetCount": {"type": ["integer", "null"], "minimum": 1, "maximum": 3},
+        "beforeDocument": {"type": "object"},
+        "requiresHumanJudgment": {"type": "boolean"},
+        "expectedLabels": {"$ref": "#/$defs/expectedLabels"}
+      }
+    },
+    "semanticSample": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sampleId", "sampleType", "taskId", "round", "phase", "instruction",
+        "contextGoals", "goalsToLabel", "retiredGoalsToLabel", "allowedPaths",
+        "candidateTargetCount", "beforeDocument", "systemOutput",
+        "requiresHumanJudgment", "expectedLabels"
+      ],
+      "properties": {
+        "sampleId": {"type": "string", "minLength": 8},
+        "sampleType": {"const": "semantic_round"},
+        "taskId": {"type": "string", "minLength": 1},
+        "round": {"type": "integer", "minimum": 1},
+        "phase": {"type": "string", "minLength": 1},
+        "instruction": {"type": "string", "minLength": 1},
+        "contextGoals": {"type": "array", "items": {"$ref": "#/$defs/goal"}},
+        "goalsToLabel": {"type": "array", "items": {"$ref": "#/$defs/goal"}, "minItems": 1},
+        "retiredGoalsToLabel": {"type": "array", "items": {"$ref": "#/$defs/retiredGoal"}},
+        "allowedPaths": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "candidateTargetCount": {"type": ["integer", "null"], "minimum": 1, "maximum": 3},
+        "beforeDocument": {"type": "object"},
+        "systemOutput": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "decision", "message", "afterDocument"],
+          "properties": {
+            "status": {"type": "string"},
+            "decision": {"enum": ["accept", "clarify", "reject", "not_applicable"]},
+            "message": {"type": ["string", "null"]},
+            "afterDocument": {"type": "object"}
+          }
+        },
+        "requiresHumanJudgment": {"type": "boolean"},
+        "expectedLabels": {"$ref": "#/$defs/expectedLabels"}
+      }
+    },
+    "candidateSample": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sampleId", "sampleType", "taskId", "round", "phase", "instruction",
+        "contextGoals", "candidateTargetCount", "beforeDocument", "candidates",
+        "requiresHumanJudgment", "expectedLabels"
+      ],
+      "properties": {
+        "sampleId": {"type": "string", "minLength": 8},
+        "sampleType": {"const": "candidate_batch"},
+        "taskId": {"type": "string", "minLength": 1},
+        "round": {"type": "integer", "minimum": 1},
+        "phase": {"type": "string", "minLength": 1},
+        "instruction": {"type": "string", "minLength": 1},
+        "contextGoals": {"type": "array", "items": {"$ref": "#/$defs/goal"}},
+        "candidateTargetCount": {"type": "integer", "minimum": 1, "maximum": 3},
+        "beforeDocument": {"type": "object"},
+        "candidates": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["candidateId", "afterDocument"],
+            "properties": {
+              "candidateId": {"type": "string", "minLength": 8},
+              "afterDocument": {"type": "object"}
+            }
+          }
+        },
+        "requiresHumanJudgment": {"const": true},
+        "expectedLabels": {"$ref": "#/$defs/expectedLabels"}
+      }
+    }
+  }
+}

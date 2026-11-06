@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "1.0",
+  "status": "draft",
+  "design": "two-model replication",
+  "budgetCapUsd": null,
+  "models": [
+    {
+      "key": "primary",
+      "provider": "unset",
+      "baseUrl": "https://example.invalid/v1",
+      "model": "unset",
+      "versionDate": "unset",
+      "temperature": 0.2,
+      "maxOutputTokens": 6000,
+      "timeoutSeconds": 70,
+      "seedSupport": false,
+      "apiKeyEnv": "PRIMARY_LLM_API_KEY",
+      "inputCostPerMillionUsd": null,
+      "outputCostPerMillionUsd": null,
+      "dataRetentionNotes": "unset"
+    },
+    {
+      "key": "replication",
+      "provider": "unset",
+      "baseUrl": "https://example.invalid/v1",
+      "model": "unset",
+      "versionDate": "unset",
+      "temperature": 0.2,
+      "maxOutputTokens": 6000,
+      "timeoutSeconds": 70,
+      "seedSupport": false,
+      "apiKeyEnv": "REPLICATION_LLM_API_KEY",
+      "inputCostPerMillionUsd": null,
+      "outputCostPerMillionUsd": null,
+      "dataRetentionNotes": "unset"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "1.0",
+  "status": "illustrative",
+  "blinded": true,
+  "benchmarkHash": "605ab226251899a01d39e774441fd8ea528adcc7abca628af0c8afc6ff9f2892",
+  "promptHash": "856ea4e70e4a837ed6d99ff7fcefb99434f1e2396fc906e51eff3447e35d9eb6",
+  "records": [
+    {
+      "sampleId": "blind-example-001",
+      "taskId": "retention-budget-hotel-L10",
+      "round": 10,
+      "annotatorId": "annotator-1",
+      "role": "annotator",
+      "goalLabels": [
+        {"goalId": "budget-cap-3000", "score": 2, "evidence": "预算保持在上限内。"},
+        {"goalId": "preserve-hotel", "score": 0, "evidence": "酒店被意外替换。"}
+      ],
+      "staleGoalLabels": [],
+      "candidateLabels": [
+        {"candidateId": "candidate-x", "relevance": 2, "humanBest": true, "evidence": "目标基本满足但说明不完整。"}
+      ],
+      "conflictLabel": {"groundTruth": "accept", "systemDecision": "accept"},
+      "notes": "仅演示合同，不是研究标签。"
+    },
+    {
+      "sampleId": "blind-example-001",
+      "taskId": "retention-budget-hotel-L10",
+      "round": 10,
+      "annotatorId": "annotator-2",
+      "role": "annotator",
+      "goalLabels": [
+        {"goalId": "budget-cap-3000", "score": 2, "evidence": "预算保持在上限内。"},
+        {"goalId": "preserve-hotel", "score": 0, "evidence": "酒店被意外替换。"}
+      ],
+      "staleGoalLabels": [],
+      "candidateLabels": [
+        {"candidateId": "candidate-x", "relevance": 2, "humanBest": true, "evidence": "目标基本满足但说明不完整。"}
+      ],
+      "conflictLabel": {"groundTruth": "accept", "systemDecision": "accept"},
+      "notes": "仅演示双标结构。"
+    }
+  ]
+}

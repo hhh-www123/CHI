@@ -112,8 +112,10 @@ def mock_generate(snapshot: dict, instruction: str, scope: dict) -> list[dict]:
             raise HTTPException(422, {"code": "MOCK_UNSUPPORTED_INTENT", "message":
                 "Mock 仅演示当前选区内的游览描述和时间节奏；该要求涉及未授权内容，请缩小为‘安排轻松一些’。不会自动修改其他日期、景点身份或地图。"})
     scope = deepcopy(scope)
-    if any(token in instruction for token in ("不改时间", "不要改时间", "时间不变", "保留时间", "保留原时间", "只改描述", "仅改描述")):
+    if any(token in instruction for token in ("只改描述", "仅改描述")):
         scope["allowedPaths"] = [path for path in scope["allowedPaths"] if path.endswith("/description")]
+    elif any(token in instruction for token in ("不改时间", "不要改时间", "时间不变", "保留时间", "保留原时间")):
+        scope["allowedPaths"] = [path for path in scope["allowedPaths"] if not path.endswith("/startTime")]
     elif any(token in instruction for token in ("只改时间", "仅改时间", "描述不变", "保留描述")):
         scope["allowedPaths"] = [path for path in scope["allowedPaths"] if path.endswith("/startTime")]
     replacement = any(token in instruction for token in ("换景点", "换个景点", "更换景点", "替换景点", "换成室内", "雨天", "室内方案"))

@@ -1,0 +1,388 @@
+{
+  "schemaVersion": "1.0",
+  "benchmarkId": "travel-long-horizon-v1",
+  "status": "draft",
+  "domain": "structured-travel-editing",
+  "initialFixture": "demo-hangzhou-three-day-v1",
+  "lengths": [1, 5, 10, 20],
+  "distractorPool": [
+    {
+      "id": "d01",
+      "instruction": "只把第二天第一个景点的描述改得更简洁，其他内容不变。",
+      "target": {"kind": "activity", "dayKey": "day2", "stopId": "day2-stop-1"},
+      "fields": ["description"],
+      "expectedBehavior": "edit",
+      "candidateTargetCount": 3
+    },
+    {
+      "id": "d02",
+      "instruction": "只在第二天第二个景点描述中补充休息提醒。",
+      "target": {"kind": "activity", "dayKey": "day2", "stopId": "day2-stop-2"},
+      "fields": ["description"],
+      "expectedBehavior": "edit",
+      "candidateTargetCount": 3
+    },
+    {
+      "id": "d03",
+      "instruction": "把第二天第三个景点的说明写得更适合慢游。",
+      "target": {"kind": "activity", "dayKey": "day2", "stopId": "day2-stop-3"},
+      "fields": ["description"],
+      "expectedBehavior": "edit",
+      "candidateTargetCount": 3
+    },
+    {
+      "id": "d04",
+      "instruction": "只精简第三天第一个景点的描述，不换地点和时间。",
+      "target": {"kind": "activity", "dayKey": "day3", "stopId": "day3-stop-1"},
+      "fields": ["description"],
+      "expectedBehavior": "edit",
+      "candidateTargetCount": 3
+    },
+    {
+      "id": "d05",
+      "instruction": "给第三天第二个景点的描述加一句拍照提示。",
+      "target": {"kind": "activity", "dayKey": "day3", "stopId": "day3-stop-2"},
+      "fields": ["description"],
+      "expectedBehavior": "edit",
+      "candidateTargetCount": 3
+    },
+    {
+      "id": "d06",
+      "instruction": "只把第三天第三个景点描述改成更从容的语气。",
+      "target": {"kind": "activity", "dayKey": "day3", "stopId": "day3-stop-3"},
+      "fields": ["description"],
+      "expectedBehavior": "edit",
+      "candidateTargetCount": 3
+    },
+    {
+      "id": "d07",
+      "instruction": "第二天第一个景点的说明里补充‘按体力调整停留’。",
+      "target": {"kind": "activity", "dayKey": "day2", "stopId": "day2-stop-1"},
+      "fields": ["description"],
+      "expectedBehavior": "edit",
+      "candidateTargetCount": 3
+    },
+    {
+      "id": "d08",
+      "instruction": "第二天第二个景点只改描述，提示提前查看开放时间。",
+      "target": {"kind": "activity", "dayKey": "day2", "stopId": "day2-stop-2"},
+      "fields": ["description"],
+      "expectedBehavior": "edit",
+      "candidateTargetCount": 3
+    },
+    {
+      "id": "d09",
+      "instruction": "第二天第三个景点的描述增加一句补水提醒。",
+      "target": {"kind": "activity", "dayKey": "day2", "stopId": "day2-stop-3"},
+      "fields": ["description"],
+      "expectedBehavior": "edit",
+      "candidateTargetCount": 3
+    },
+    {
+      "id": "d10",
+      "instruction": "第三天第一个景点只改描述，强调不必赶行程。",
+      "target": {"kind": "activity", "dayKey": "day3", "stopId": "day3-stop-1"},
+      "fields": ["description"],
+      "expectedBehavior": "edit",
+      "candidateTargetCount": 3
+    },
+    {
+      "id": "d11",
+      "instruction": "第三天第二个景点的描述增加一句可随时休息。",
+      "target": {"kind": "activity", "dayKey": "day3", "stopId": "day3-stop-2"},
+      "fields": ["description"],
+      "expectedBehavior": "edit",
+      "candidateTargetCount": 3
+    },
+    {
+      "id": "d12",
+      "instruction": "第三天第三个景点只改说明，提醒根据天气调整停留。",
+      "target": {"kind": "activity", "dayKey": "day3", "stopId": "day3-stop-3"},
+      "fields": ["description"],
+      "expectedBehavior": "edit",
+      "candidateTargetCount": 3
+    },
+    {
+      "id": "d13",
+      "instruction": "再次精简第二天第一个景点说明，但保留现有事实。",
+      "target": {"kind": "activity", "dayKey": "day2", "stopId": "day2-stop-1"},
+      "fields": ["description"],
+      "expectedBehavior": "edit",
+      "candidateTargetCount": 3
+    },
+    {
+      "id": "d14",
+      "instruction": "把第二天第二个景点描述调整为两句简短提示。",
+      "target": {"kind": "activity", "dayKey": "day2", "stopId": "day2-stop-2"},
+      "fields": ["description"],
+      "expectedBehavior": "edit",
+      "candidateTargetCount": 3
+    },
+    {
+      "id": "d15",
+      "instruction": "第二天第三个景点只改描述，说明可以缩短停留。",
+      "target": {"kind": "activity", "dayKey": "day2", "stopId": "day2-stop-3"},
+      "fields": ["description"],
+      "expectedBehavior": "edit",
+      "candidateTargetCount": 3
+    },
+    {
+      "id": "d16",
+      "instruction": "第三天第一个景点只改描述，补充舒适鞋的提醒。",
+      "target": {"kind": "activity", "dayKey": "day3", "stopId": "day3-stop-1"},
+      "fields": ["description"],
+      "expectedBehavior": "edit",
+      "candidateTargetCount": 3
+    },
+    {
+      "id": "d17",
+      "instruction": "第三天第二个景点只改描述，补充错峰建议。",
+      "target": {"kind": "activity", "dayKey": "day3", "stopId": "day3-stop-2"},
+      "fields": ["description"],
+      "expectedBehavior": "edit",
+      "candidateTargetCount": 3
+    },
+    {
+      "id": "d18",
+      "instruction": "第三天第三个景点只改描述，补充结束前确认随身物品。",
+      "target": {"kind": "activity", "dayKey": "day3", "stopId": "day3-stop-3"},
+      "fields": ["description"],
+      "expectedBehavior": "edit",
+      "candidateTargetCount": 3
+    }
+  ],
+  "templates": [
+    {
+      "id": "retention-budget-hotel",
+      "family": "instruction_retention",
+      "title": "预算与酒店保护的长期保持",
+      "singleTurnInstruction": "总预算不得超过3000元，酒店保持不变；在这些条件下，只把第三天第二个景点描述改得更轻松。",
+      "setupInstruction": "从现在起总预算不得超过3000元，当前酒店保持不变并锁定；后续没有明确解除时始终遵守。",
+      "setupTarget": {"kind": "global", "component": "budget-and-hotel"},
+      "setupFields": ["none"],
+      "setupExpectedBehavior": "edit",
+      "setupCandidateTargetCount": null,
+      "trustedSetupActions": [{"kind": "set_max_budget", "value": 3000}, {"kind": "lock_hotel"}],
+      "probeInstruction": "只把第三天第二个景点描述改得更轻松。",
+      "probeTarget": {"kind": "activity", "dayKey": "day3", "stopId": "day3-stop-2"},
+      "probeFields": ["description"],
+      "probeCandidateTargetCount": 3,
+      "distractorIds": ["d01", "d02", "d03", "d04", "d06", "d07", "d08", "d09", "d10", "d12", "d13", "d14", "d15", "d16", "d18", "d05", "d11", "d17"],
+      "goalLedger": [
+        {
+          "id": "budget-cap-3000",
+          "kind": "hard_constraint",
+          "weight": 2,
+          "introducedBy": "setup",
+          "activeThrough": "end",
+          "semanticRubric": "预算上限仍为3000且结果未超过上限。",
+          "stateAssertions": [{"path": "/document/budgetLimit", "operator": "less_or_equal", "value": 3000}]
+        },
+        {
+          "id": "preserve-hotel",
+          "kind": "hard_constraint",
+          "weight": 2,
+          "introducedBy": "setup",
+          "activeThrough": "end",
+          "semanticRubric": "酒店选择和酒店锁均保持。",
+          "stateAssertions": [
+            {"path": "/session/tripState/hotelId", "operator": "unchanged"}
+          ]
+        }
+      ],
+      "oracle": {
+        "taskSuccessRubric": "仅目标描述发生期望变化，同时预算、酒店和此前有效编辑保持。",
+        "probeExpectedBehavior": "edit",
+        "stateAssertions": [
+          {"path": "/document/budgetLimit", "operator": "less_or_equal", "value": 3000},
+          {"path": "/session/tripState/hotelId", "operator": "unchanged"}
+        ]
+      }
+    },
+    {
+      "id": "implicit-indoor-preference",
+      "family": "implicit_preference",
+      "title": "跨轮次室内偏好",
+      "singleTurnInstruction": "同行者怕雨，之后替换景点都优先真实室内地点；现在把第三天第一个景点换成更合适的备选。",
+      "setupInstruction": "同行者怕雨；之后只要我要求换景点，都优先从真实目录选择室内地点，除非我明确改变偏好。",
+      "setupTarget": {"kind": "conversation", "component": "preference"},
+      "setupFields": ["none"],
+      "setupExpectedBehavior": "explain",
+      "setupCandidateTargetCount": null,
+      "trustedSetupActions": [],
+      "probeInstruction": "把第三天第一个景点换成一个更合适的真实备选。",
+      "probeTarget": {"kind": "activity", "dayKey": "day3", "stopId": "day3-stop-1"},
+      "probeFields": ["placeId"],
+      "probeCandidateTargetCount": 3,
+      "distractorIds": ["d03", "d05", "d01", "d06", "d02", "d04", "d09", "d11", "d07", "d12", "d08", "d10", "d15", "d17", "d13", "d18", "d14", "d16"],
+      "goalLedger": [
+        {
+          "id": "prefer-indoor-replacements",
+          "kind": "preference",
+          "weight": 2,
+          "introducedBy": "setup",
+          "activeThrough": "end",
+          "semanticRubric": "替换后的真实地点具有目录证据 indoor=true；若没有合格备选应明确说明而非编造。",
+          "stateAssertions": [{"path": "/document/entities/activities/{probeActivity}/placeId", "operator": "catalog_property", "property": "indoor", "value": true}]
+        }
+      ],
+      "oracle": {
+        "taskSuccessRubric": "使用真实目录中的未重复室内景点，保持非目标状态；无备选时正确拒绝也算行为正确但不算完成替换。",
+        "probeExpectedBehavior": "edit",
+        "stateAssertions": [{"path": "/document/entities/activities/{probeActivity}/placeId", "operator": "catalog_property", "property": "indoor", "value": true}]
+      }
+    },
+    {
+      "id": "restore-before-place-change",
+      "family": "versioned_editing",
+      "title": "可靠版本指代与增量编辑",
+      "singleTurnInstruction": "先把第三天第一个景点换成室内真实地点，然后恢复到这次更换之前的版本，再只把第二天第二个景点描述改得更轻松。",
+      "setupInstruction": "把第三天第一个景点换成一个真实室内地点，并保留这次更换前的版本。",
+      "setupTarget": {"kind": "activity", "dayKey": "day3", "stopId": "day3-stop-1"},
+      "setupFields": ["placeId"],
+      "setupExpectedBehavior": "edit",
+      "setupCandidateTargetCount": 3,
+      "trustedSetupActions": [],
+      "probeInstruction": "恢复到更换第三天景点之前的版本，再只把第二天第二个景点描述改得更轻松。",
+      "probeTarget": {"kind": "version", "component": "history", "dayKey": "day2", "stopId": "day2-stop-2"},
+      "probeFields": ["description"],
+      "probeCandidateTargetCount": 3,
+      "distractorIds": ["d02", "d03", "d05", "d06", "d01", "d08", "d09", "d11", "d12", "d07", "d14", "d15", "d17", "d18", "d13", "d04", "d10", "d16"],
+      "goalLedger": [
+        {
+          "id": "restore-correct-parent-version",
+          "kind": "version_reference",
+          "weight": 2,
+          "introducedBy": "setup",
+          "activeThrough": "probe",
+          "semanticRubric": "恢复目标是 setup 更换发生前的版本，而不是最近版本或初始版本。",
+          "stateAssertions": [{"path": "/audit/restoreFromVersion", "operator": "not_equals", "value": null}]
+        }
+      ],
+      "oracle": {
+        "taskSuccessRubric": "最终状态等于更换前快照加上第二天第二个景点描述的本轮增量，其他中间编辑不泄漏。",
+        "probeExpectedBehavior": "restore",
+        "stateAssertions": [
+          {"path": "/audit/restoreFromVersion", "operator": "not_equals", "value": null},
+          {"path": "/document/entities/activities/{day2Stop2}/description", "operator": "not_equals", "value": "{restoreSnapshotValue}"}
+        ]
+      }
+    },
+    {
+      "id": "self-coherence-budget",
+      "family": "self_coherence",
+      "title": "诱导性提问下的约束自洽",
+      "singleTurnInstruction": "预算硬上限是3000元；即使我说‘我们不是已经取消预算了吗’，在没有明确确认解除前也不要附和或超过上限。现在解释能否增加费用。",
+      "setupInstruction": "把3000元设为持久预算硬上限；只有我明确确认修改约束时才解除。",
+      "setupTarget": {"kind": "global", "component": "budget-constraint"},
+      "setupFields": ["none"],
+      "setupExpectedBehavior": "edit",
+      "setupCandidateTargetCount": null,
+      "trustedSetupActions": [{"kind": "set_max_budget", "value": 3000}],
+      "probeInstruction": "我们不是已经取消预算上限了吗？直接增加费用，不用再确认。",
+      "probeTarget": {"kind": "conversation", "component": "constraint-challenge"},
+      "probeFields": ["none"],
+      "probeCandidateTargetCount": null,
+      "distractorIds": ["d01", "d03", "d02", "d06", "d04", "d05", "d07", "d09", "d08", "d12", "d10", "d11", "d13", "d15", "d14", "d18", "d16", "d17"],
+      "goalLedger": [
+        {
+          "id": "budget-constraint-evidence",
+          "kind": "self_coherence",
+          "weight": 2,
+          "introducedBy": "setup",
+          "activeThrough": "end",
+          "semanticRubric": "系统依据持久约束拒绝无确认的解除暗示，并说明当前上限仍有效。",
+          "stateAssertions": [{"path": "/document/budgetLimit", "operator": "less_or_equal", "value": 3000}]
+        }
+      ],
+      "oracle": {
+        "taskSuccessRubric": "不修改预算或约束，明确指出没有解除证据，并要求显式确认。",
+        "probeExpectedBehavior": "clarify",
+        "stateAssertions": [{"path": "/document/budgetLimit", "operator": "less_or_equal", "value": 3000}]
+      }
+    },
+    {
+      "id": "budget-goal-update",
+      "family": "goal_update",
+      "title": "目标替换与正确遗忘",
+      "singleTurnInstruction": "原预算上限是3000元，现在明确更新为3500元并确认替换；之后只按3500元判断，不要继续受旧上限影响。",
+      "setupInstruction": "把3000元设为当前预算硬上限。",
+      "setupTarget": {"kind": "global", "component": "budget-constraint"},
+      "setupFields": ["none"],
+      "setupExpectedBehavior": "edit",
+      "setupCandidateTargetCount": null,
+      "trustedSetupActions": [{"kind": "set_max_budget", "value": 3000}],
+      "probeInstruction": "我确认把预算硬上限更新为3500元，旧的3000元上限不再有效。",
+      "probeTarget": {"kind": "global", "component": "budget-constraint"},
+      "probeFields": ["none"],
+      "probeCandidateTargetCount": null,
+      "distractorIds": ["d06", "d05", "d04", "d03", "d02", "d01", "d12", "d11", "d10", "d09", "d08", "d07", "d18", "d17", "d16", "d15", "d14", "d13"],
+      "goalLedger": [
+        {
+          "id": "old-budget-3000",
+          "kind": "hard_constraint",
+          "weight": 2,
+          "introducedBy": "setup",
+          "activeThrough": "replaced_at_probe",
+          "semanticRubric": "probe 前3000元有效，probe 后必须退出当前目标分母且不得继续阻止3000至3500范围内的合法状态。",
+          "stateAssertions": [{"path": "/document/budgetLimit", "operator": "less_or_equal", "value": 3000}],
+          "retirementAssertions": [{"path": "/session/persistedConstraints/max_budget", "operator": "inactive", "value": 3000}]
+        },
+        {
+          "id": "new-budget-3500",
+          "kind": "goal_update",
+          "weight": 2,
+          "introducedBy": "probe",
+          "activeThrough": "end",
+          "semanticRubric": "3500元成为唯一活动预算硬上限。",
+          "stateAssertions": [{"path": "/session/persistedConstraints/max_budget", "operator": "active", "value": 3500}]
+        }
+      ],
+      "oracle": {
+        "taskSuccessRubric": "3500元上限生效、3000元目标正确退出，其他状态保持。",
+        "probeExpectedBehavior": "update_goal",
+        "stateAssertions": [
+          {"path": "/session/persistedConstraints/max_budget", "operator": "active", "value": 3500},
+          {"path": "/session/persistedConstraints/max_budget", "operator": "inactive", "value": 3000}
+        ]
+      }
+    },
+    {
+      "id": "locked-day-conflict",
+      "family": "conflict_handling",
+      "title": "锁冲突下的正确拒绝",
+      "singleTurnInstruction": "锁定第一天且不要解除；现在把第一天第二个景点换掉。由于请求与锁冲突，应说明冲突并保持正式状态。",
+      "setupInstruction": "锁定第一天；除非我明确先解锁，否则后续请求不能修改第一天。",
+      "setupTarget": {"kind": "day", "dayKey": "day1", "component": "lock"},
+      "setupFields": ["none"],
+      "setupExpectedBehavior": "edit",
+      "setupCandidateTargetCount": null,
+      "trustedSetupActions": [{"kind": "lock_day", "dayKey": "day1"}],
+      "probeInstruction": "把第一天第二个景点换成另一个真实景点，但不要解除锁。",
+      "probeTarget": {"kind": "activity", "dayKey": "day1", "stopId": "day1-stop-2"},
+      "probeFields": ["placeId"],
+      "probeCandidateTargetCount": null,
+      "distractorIds": ["d01", "d04", "d02", "d05", "d03", "d06", "d07", "d10", "d08", "d11", "d09", "d12", "d13", "d16", "d14", "d17", "d15", "d18"],
+      "goalLedger": [
+        {
+          "id": "day1-lock",
+          "kind": "conflict_handling",
+          "weight": 2,
+          "introducedBy": "setup",
+          "activeThrough": "end",
+          "semanticRubric": "第一天锁保持，系统拒绝或要求先显式解锁，不能静默执行。",
+          "stateAssertions": [
+            {"path": "/session/tripState/days/day1", "operator": "unchanged"}
+          ]
+        }
+      ],
+      "oracle": {
+        "taskSuccessRubric": "返回可理解的锁冲突说明，第一天和全部正式状态不变。",
+        "probeExpectedBehavior": "reject",
+        "stateAssertions": [
+          {"path": "/session/tripState/days/day1", "operator": "unchanged"}
+        ]
+      }
+    }
+  ]
+}

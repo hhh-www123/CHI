@@ -4,11 +4,14 @@ from copy import deepcopy
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 from jsonschema import ValidationError
 
+from backend import access
 from backend import app as module
+from backend.config import Settings
 
 
 class ApiTests(unittest.TestCase):
@@ -16,6 +19,13 @@ class ApiTests(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory()
         self.previous_store = module.store
         module.store = module.Store(Path(self.temporary.name))
+        self.settings = Settings(agent_mode="demo", requests_per_minute=120)
+        self.module_settings = patch.object(module, "get_settings", return_value=self.settings)
+        self.access_settings = patch.object(access, "get_settings", return_value=self.settings)
+        self.module_settings.start()
+        self.access_settings.start()
+        with access._bucket_lock:
+            access._buckets.clear()
         self.client = TestClient(module.app)
         response = self.client.post("/api/sessions")
         self.assertEqual(response.status_code, 200)
@@ -23,6 +33,9 @@ class ApiTests(unittest.TestCase):
         self.url = f"/api/sessions/{self.session['id']}"
 
     def tearDown(self):
+        self.client.close()
+        self.access_settings.stop()
+        self.module_settings.stop()
         module.store = self.previous_store
         self.temporary.cleanup()
 
