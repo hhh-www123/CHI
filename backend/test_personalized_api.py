@@ -59,7 +59,7 @@ class PersonalizedAPITests(unittest.TestCase):
         # Fixture identities are intentionally separate from the Hangzhou catalog.
         places = [{"id": f"fixture-suzhou-{i}", "name": f"苏州测试景点{i}", "city": "苏州市", "address": f"苏州测试路{i}号", "location": "苏州测试区", "indoor": bool(i % 2), "category": "测试地点", "description": "Isolated test fixture", "durationMinutes": 60, "cost": i, "transportCost": 2, "costEstimated": True, "mapPoiId": f"BTESTPLACE{i:04}", "sourceUrl": f"https://www.amap.com/place/BTESTPLACE{i:04}"} for i in range(1, 17)]
         hotels = [{"id": f"fixture-suzhou-hotel-{i}", "name": f"苏州测试酒店{i}", "address": f"苏州测试酒店路{i}号", "location": "苏州测试区", "description": "Isolated hotel fixture", "nightlyPrice": 200 * i, "priceEstimated": True, "sourceUrl": f"https://www.amap.com/place/BTESTHOTEL{i:04}"} for i in range(1, 3)]
-        catalog = {"city": "苏州市", "adcode": "320500", "version": "fixture-suzhou-v1", "places": places, "hotels": hotels}
+        catalog = {"city": "苏州市", "adcode": "320500", "version": "fixture-suzhou-v1", "places": places, "hotels": hotels, "pricing": deepcopy(trip_setup.PRICING_POLICY)}
         days, regions = {}, {}
         start = date.fromisoformat(body.startDate)
         for number in range(1, body.dayCount + 1):
@@ -96,7 +96,8 @@ class PersonalizedAPITests(unittest.TestCase):
         self.assertEqual(len(value["tripState"]["days"]), 14)
         self.assertEqual(set(value["uiSpec"]["regions"]), {f"day-{i}" for i in range(1, 15)})
         self.assertEqual(value["tripState"]["days"]["day14"]["date"], "2026-11-14")
-        self.assertEqual(value["derived"], {"attractions": 315, "transport": 84, "food": 5040, "hotel": 5200, "total": 10639, "remaining": -1639})
+        self.assertEqual(value["catalog"]["pricing"]["foodPerPersonDay"], 180)
+        self.assertEqual(value["derived"], {"attractions": 315, "transport": 84, "food": 7560, "hotel": 5200, "total": 13159, "remaining": -4159.0})
         self.assertEqual(value["catalog"]["places"][0]["id"], "fixture-suzhou-1")
         self.assertEqual(value["catalog"]["hotels"][0]["id"], "fixture-suzhou-hotel-1")
         stored = module.store.get(value["id"])

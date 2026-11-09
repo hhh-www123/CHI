@@ -99,7 +99,7 @@ const injectLegacyFixture = id => fixturePython(
     await page.getByTestId('trip-setup').waitFor();
     assert.equal(await page.getByRole('tabpanel').count(), 0);
     assert.equal(await page.locator('#setup-city').inputValue(), '');
-    let session = await action('POST', '/api/sessions', () => page.getByTestId('open-three-day-demo').click());
+    let session = await action('POST', '/api/demo-sessions', () => page.getByTestId('open-three-day-demo').click());
     tripId = session.id;
     await page.getByRole('tabpanel').waitFor();
     assert.equal(await page.getByRole('tab').count(), 3);
@@ -231,7 +231,7 @@ const injectLegacyFixture = id => fixturePython(
     assert.equal(await page.getByTestId('local-patch-preview').count(), 0);
     record('Authorized time Patch applies; invalid time ordering is rejected without changing formal state');
 
-    await selection().getByRole('button', { name: '浏览模式', exact: true }).click();
+    await page.getByTestId('browse-mode-toggle').click();
     const note = page.getByLabel('第二天行程备注', { exact: true });
     await note.fill('Phase 1 isolated regression note');
     session = await action('PATCH', '/direct', () => note.blur());
@@ -249,17 +249,19 @@ const injectLegacyFixture = id => fixturePython(
     assert.equal(session.uiSpec.regions['day-2'].view, 'cards');
     record('Existing note saving, real catalog alternatives, and trusted cards/timeline controls remain usable');
 
-    session = await action('POST', '/routes', () => page.getByTestId('refresh-day-routes').click());
-    assert.equal(session.routeData['day-2'].status, 'unconfigured');
-    assert.ok(session.uiSpec.regions['day-2'].showMap);
-    assert.ok(session.uiSpec.regions['day-2'].showTransport);
-    await page.locator('.route-map-section').waitFor();
-    assert.ok((await page.locator('.map-unavailable').innerText()).includes('地图服务尚未配置'));
+    const beforeMapPrompt = structuredClone(session);
+    const beforeMapPromptRow = readStored(tripId);
+    await page.getByTestId('refresh-day-routes').click();
+    const mapSettings = page.getByRole('dialog', { name: '服务接入', exact: true });
+    await mapSettings.waitFor();
+    assert.ok(await mapSettings.getByTestId('amap-integration-form').evaluate(node => node.classList.contains('is-target')));
+    assert.match(await mapSettings.getByTestId('amap-integration-form').innerText(), /高德地图 API|未接入/);
+    assert.deepEqual(await current(), beforeMapPrompt);
+    assert.equal(readStored(tripId), beforeMapPromptRow);
+    await mapSettings.getByRole('button', { name: '关闭服务接入', exact: true }).click();
     const sourceUrls = await page.locator('.place-source-link').evaluateAll(links => links.map(item => item.href));
     assert.ok(sourceUrls.length > 0 && sourceUrls.every(value => value.startsWith('https://')));
-    const mapImage = await context.request.get(base + '/api/sessions/' + tripId + '/map/day-2?v=' + session.version);
-    assert.equal(mapImage.status(), 503, 'Unconfigured map must explicitly refuse a real map image');
-    record('Original map/transport sections and safe place links render; no-key route state is explicitly unconfigured');
+    record('Safe place links remain available; a no-key route click prompts for the high-de map API without mutating the trip');
 
     const idsBeforeUndo = Object.keys(session.componentRegistry).sort();
     const locksBeforeUndo = session.persistedConstraints;

@@ -1,15 +1,17 @@
 import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react';
-import { ArrowDownToLine, ArrowLeft, ArrowRight, ArrowUpRight, Bus, CalendarDays, Check, CheckCircle2, ChevronDown, Clock3, Compass, History, LayoutGrid, Leaf, LoaderCircle, LockKeyhole, MapPin, Mountain, Plus, RefreshCw, RotateCcw, ShieldCheck, Sparkles, Sun, Umbrella, UnlockKeyhole, Wallet, X } from 'lucide-react';
+import { ArrowDownToLine, ArrowLeft, ArrowRight, ArrowUpRight, BookOpen, Bus, CalendarDays, Check, CheckCircle2, ChevronDown, Clock3, Compass, History, LayoutGrid, Leaf, LoaderCircle, LockKeyhole, MapPin, Mountain, Plus, RefreshCw, RotateCcw, Settings2, ShieldCheck, Sparkles, Sun, Umbrella, UnlockKeyhole, Wallet, X } from 'lucide-react';
 import { api, ApiError } from './api';
 import { DayRouteMap, GeneratedBlocks, TransportLeg } from './components/JourneyComponents';
 import { LocalEditor, bindingFor, isComponentLocked, PERIOD_LABELS, selectionAttributes } from './features/agentic-editor/LocalEditor';
 import { TripSetup } from './components/TripSetup';
+import { GuidePage } from './components/GuidePage';
+import { ServiceSettings } from './components/ServiceSettings';
 import { StopCardContent } from './components/StopCardContent';
 import { CandidatePanel } from './features/agentic-editor/CandidatePanel';
 import { VersionHistory } from './features/agentic-editor/VersionHistory';
 import { GlobalControls } from './features/agentic-editor/GlobalControls';
 import type { DisplayChange } from './features/agentic-editor/historyTypes';
-import { sessionDayItems, type TripSetupRequest, type AgentStatus, type Catalog, type DayKey, type DirectUpdate, type Proposal, type ProposalBatch, type RegionId, type Session, type TargetRegion } from './types';
+import { sessionDayItems, type TripSetupRequest, type AgentStatus, type Catalog, type DayKey, type DirectUpdate, type IntegrationStatus, type Proposal, type ProposalBatch, type RegionId, type Session, type TargetRegion } from './types';
 
 const STORAGE_KEY = 'travel-genui-phase1-session-v1';
 const money = (n: number) => `¥${n.toLocaleString('zh-CN')}`;
@@ -64,10 +66,9 @@ export default function App() {
   const [session, setSession] = useState<Session | null>(null);
   const dayItems = sessionDayItems(session);
   const [showSetup, setShowSetup] = useState(true);
+  const [activePage, setActivePage] = useState<'planner' | 'guide'>('planner');
   const [tripOverviewCollapsed, setTripOverviewCollapsed] = useState(false);
   const [setupError, setSetupError] = useState('');
-  const [copyStyleOpen, setCopyStyleOpen] = useState(false);
-  const [copyTargets, setCopyTargets] = useState<RegionId[]>([]);
   const [agentStatus, setAgentStatus] = useState<AgentStatus | null>(null);
   const [generatingSeconds, setGeneratingSeconds] = useState(0);
   const sessionRef = useRef<Session | null>(null);
@@ -103,6 +104,9 @@ export default function App() {
   const [replaceStopId, setReplaceStopId] = useState('');
   const [historyOpen, setHistoryOpen] = useState(false);
   const [resetOpen, setResetOpen] = useState(false);
+  const [serviceSettingsOpen, setServiceSettingsOpen] = useState(false);
+  const [serviceSettingsTarget, setServiceSettingsTarget] = useState<'model' | 'amap'>('model');
+  const [serviceRevision, setServiceRevision] = useState(0);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const toastId = useRef(0);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -160,12 +164,10 @@ export default function App() {
         }
         if (controller.signal.aborted) return;
         setAgentStatus(status);
-        if (nextSession) {
-          const nextCatalog = nextSession.catalog ?? await api.catalog(controller.signal);
-          if (controller.signal.aborted) return;
-          setCatalog(nextCatalog);
-          commitSession(nextSession, true);
-        }
+        const nextCatalog = nextSession?.catalog ?? await api.catalog(controller.signal);
+        if (controller.signal.aborted) return;
+        setCatalog(nextCatalog);
+        if (nextSession) commitSession(nextSession, true);
         setShowSetup(true);
       } catch (error) {
         if (!controller.signal.aborted) setConnectionError(error instanceof Error ? error.message : '无法载入行程，请重试。');
@@ -207,31 +209,31 @@ export default function App() {
     try {
       const next = await api.createSession(settings, controller.signal);
       if (controller.signal.aborted) return;
-      if (!next.catalog?.places.length || !next.catalog.hotels.length || !sessionDayItems(next).length) throw new ApiError(502, '规划结果缺少完整行程或真实地点目录，请重试。');
+      if (!next.catalog?.places.length || !next.catalog.hotels.length || !sessionDayItems(next).length) throw new ApiError(502, '规划结果缺少完整行程或地点目录，请重试。');
       const first = sessionDayItems(next)[0];
       commitSession(next, true);
       setSelectedDay(first.key); setTargetRegion(first.region); previewReturnDay.current = first.key;
       setProposal(null); setProposalBatch(null); setSurfaceErrors({}); setSurfaceReady({}); repairAttempts.current = 0;
-      setInstruction(''); setGenerateCandidates(false); setShowCandidatePreview(true); setCopyStyleOpen(false);
-      markEdited(); setShowSetup(false);
+      setInstruction(''); setGenerateCandidates(false); setShowCandidatePreview(true);
+      markEdited(); setActivePage('planner'); setShowSetup(false);
       notify('行程已规划并保存，可以继续用文字调整页面。');
     } catch (error) {
       if (!(error instanceof DOMException && error.name === 'AbortError')) setSetupError(error instanceof Error ? error.message : '规划失败，请稍后重试。');
     } finally { busyRef.current = false; setBusy(''); }
   }
-  async function openDemoTrip() {
+  async function openDemoTrip(settings: TripSetupRequest) {
     if (busyRef.current) return;
     busyRef.current = true; setBusy('正在规划行程'); setSetupError('');
     const controller = new AbortController(); actionController.current = controller;
     try {
-      const next = await api.createDemoSession(controller.signal);
+      const next = await api.createDemoSession(settings, controller.signal);
       if (controller.signal.aborted) return;
       commitSession(next, true);
       const first = sessionDayItems(next)[0];
       setSelectedDay(first.key); setTargetRegion(first.region);
       setSelectedComponentId(null); setEditorMode(false);
-      setProposal(null); setProposalBatch(null); markEdited(); setShowSetup(false);
-      notify('已打开固定杭州三日演示，未调用模型或地图服务。', 'info');
+      setProposal(null); setProposalBatch(null); markEdited(); setActivePage('planner'); setShowSetup(false);
+      notify('已按当前日期、天数、预算与偏好生成杭州示例；未调用模型或地图服务。', 'info');
     } catch (error) { setSetupError(error instanceof Error ? error.message : '演示行程载入失败。'); }
     finally { busyRef.current = false; setBusy(''); }
   }
@@ -288,47 +290,29 @@ export default function App() {
     return ok;
   }
   function openTripSetup() {
-    if (busyRef.current) return;
-    if (hasDrafts || pendingStateSaves.current) { notify('请先等待已有输入保存，再规划新行程。', 'info'); return; }
-    setSetupError(''); setShowSetup(true); setProposal(null); setProposalBatch(null); setHistoryOpen(false); setResetOpen(false);
+    if (busyRef.current) return false;
+    if (hasDrafts || pendingStateSaves.current) { notify('请先等待已有输入保存，再规划新行程。', 'info'); return false; }
+    setSetupError(''); setActivePage('planner'); setShowSetup(true); setProposal(null); setProposalBatch(null); setHistoryOpen(false); setResetOpen(false);
     markEdited();
+    return true;
   }
-  function openStyleCopy() {
-    if (!session || busyRef.current || previewing || hasDrafts || pendingStateSaves.current) return;
-    setCopyTargets([]);
-    setCopyStyleOpen(true);
-  }
-  async function previewStyleCopy() {
-    const current = sessionRef.current;
-    if (!current || busyRef.current || !copyTargets.length || hasDrafts || pendingStateSaves.current) return;
-    const source = activeRegion;
-    const targets = [...copyTargets];
-    const text = `将${dayItem.label}已保存的页面样式应用到${targets.map(region => dayItems.find(item => item.region === region)?.label ?? region).join('、')}，保留各天的景点、时间、备注与行程数据`;
-    const revision = markEdited();
-    previewReturnDay.current = selectedDay;
-    setInstruction(text); setGenerateCandidates(false); setProposal(null); setProposalBatch(null); setSurfaceErrors({}); setSurfaceReady({}); repairAttempts.current = 0;
-    busyRef.current = true; setBusy('正在预览样式复用');
-    const controller = new AbortController(); actionController.current = controller;
-    try {
-      const result = await api.copyStyle(current.id, current.version, source, targets, controller.signal);
-      if (controller.signal.aborted) return;
-      const candidates = result.candidates?.length ? result.candidates : [result];
-      if (candidates.length !== 1) throw new ApiError(502, '样式复用未返回有效的单个预览，请重试。');
-      setProposalBatch({ ...result, generateCandidates: false, candidates }); setProposal(candidates[0]); setProposalRevision(revision); setShowCandidatePreview(true);
-      const first = dayItems.find(item => item.region === candidates[0].affectedRegionIds?.[0]) ?? dayItems.find(item => item.region === targets[0]);
-      if (first) { setSelectedDay(first.key); setTargetRegion(first.region); }
-      setCopyStyleOpen(false);
-      requestAnimationFrame(() => revealInPane(previewSurface.current));
-    } catch (error) { await recoverError(error); }
-    finally { busyRef.current = false; setBusy(''); }
-  }
-
   async function refreshAgentStatus() {
     try {
       const status = await api.agentStatus();
       setAgentStatus(status);
       notify(status.configured || status.mode === 'demo' ? '已更新后台生成服务状态。' : '后台模型仍未配置，现有行程可以继续手动编辑。', 'info');
     } catch (error) { notify(error instanceof Error ? error.message : '暂时无法检查后台服务。', 'error'); }
+  }
+
+  function openServiceSettings(target: 'model' | 'amap' = 'model') {
+    setServiceSettingsTarget(target);
+    setServiceSettingsOpen(true);
+  }
+
+  async function integrationChanged(_status: IntegrationStatus) {
+    const next = await api.agentStatus().catch(() => null);
+    if (next) setAgentStatus(next);
+    setServiceRevision(value => value + 1);
   }
 
   async function recoverError(error: unknown) {
@@ -463,6 +447,7 @@ export default function App() {
   }
   async function refreshRoutes(target: TargetRegion = activeRegion) {
     if (busyRef.current || !sessionRef.current) return;
+    if (!agentStatus?.mapConfigured) { notify('请先接入高德地图 API，再查询交通与地图。', 'info'); openServiceSettings('amap'); return; }
     if (hasDrafts) { notify('请先移开输入框保存备注、时间或预算，再查询路线。', 'info'); return; }
     markEdited();
     const ok = await mutate('正在查询路线', (current, signal) => api.refreshRoutes(current.id, current.version, target, signal));
@@ -498,7 +483,7 @@ export default function App() {
   }
   function exportPlan() {
     if (!session) return;
-    const blob = new Blob([JSON.stringify({ exportedAt: new Date().toISOString(), demoNotice: '景点和酒店为真实地点；门票、住宿及其他费用为预算估算，不代表实时票价、房态或预订。地图查询结果单独记录来源与时间。', ...session }, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify({ exportedAt: new Date().toISOString(), demoNotice: '门票、住宿及其他费用为预算估算，不代表实时票价、房态或预订。地图查询结果单独记录来源与时间。', ...session }, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url; link.download = `旅序-${session.tripState.city}-${dayItems.length}天行程.json`; link.click(); URL.revokeObjectURL(url);
@@ -519,8 +504,10 @@ export default function App() {
   const regionLocked = !!session?.controlState.lockedRegions.includes(activeRegion);
   const targetLocked = targetRegion !== 'all' && !!session?.controlState.lockedRegions.includes(targetRegion);
   const hasLockedDays = !!session?.controlState.lockedRegions.length;
-  const agentConfigured = agentStatus?.mode === 'llm' && agentStatus.configured;
   const agentDemo = agentStatus?.mode === 'demo';
+  const connectedServiceCount = Number(!!agentStatus?.configured) + Number(!!agentStatus?.mapConfigured);
+  const serviceConnectionClass = !agentStatus ? 'is-pending' : connectedServiceCount === 2 ? 'is-complete' : connectedServiceCount === 1 ? 'is-partial' : 'is-empty';
+  const serviceConnectionTitle = !agentStatus ? '正在读取服务状态' : `${agentStatus.configured ? `模型已接入${agentStatus.provider ? ` · ${agentStatus.provider}` : ''}` : '模型未接入'}；${agentStatus.mapConfigured ? '高德地图已接入' : '高德地图未接入'}`;
   const routeData = previewing ? candidateUpdate?.routeData ?? (candidateUpdate?.nextData ? undefined : session?.routeData?.[activeRegion]) : session?.routeData?.[activeRegion];
   const candidateMapId = previewing && candidateUpdate?.routeData ? proposal.proposalId : undefined;
   const candidateOptions = proposalBatch?.candidates ?? (proposal ? [proposal] : []);
@@ -531,6 +518,11 @@ export default function App() {
   const proposalRegions = proposal?.affectedRegionIds ?? proposal?.updates?.map(update => update.regionId) ?? (proposal && proposal.targetRegionId !== 'all' ? [proposal.targetRegionId] : []);
   const displayTrip = session ? { ...session.tripState, ...(previewing ? proposal?.nextTrip ?? {} : {}) } : undefined;
   const selectedHotel = catalog?.hotels.find(hotel => hotel.id === displayTrip?.hotelId);
+  const hotelGroups = catalog ? [
+    { label: '预算友好 · ¥700 以下', hotels: catalog.hotels.filter(hotel => hotel.nightlyPrice <= 700) },
+    { label: '舒适精选 · ¥701–¥1,200', hotels: catalog.hotels.filter(hotel => hotel.nightlyPrice > 700 && hotel.nightlyPrice <= 1200) },
+    { label: '度假品质 · ¥1,200 以上', hotels: catalog.hotels.filter(hotel => hotel.nightlyPrice > 1200) },
+  ].filter(group => group.hotels.length) : [];
   const placeById = (id: string) => catalog?.places.find(place => place.id === id);
   const alternatives = catalog?.places.filter(place => place.indoor && !day?.stops.some(stop => stop.placeId === place.id)) ?? [];
   const replaceStop = day?.stops.find(stop => stop.id === replaceStopId);
@@ -544,11 +536,29 @@ export default function App() {
     const travelers = displayTrip?.travelers ?? 1;
     const attractions = places.reduce((sum, place) => sum + (place?.cost ?? 0), 0) * travelers;
     const transport = places.reduce((sum, place) => sum + (place?.transportCost ?? 0), 0) * travelers;
-    const food = 120 * days.length * travelers;
+    const food = (catalog.pricing?.foodPerPersonDay ?? 180) * days.length * travelers;
     const hotel = (selectedHotel?.nightlyPrice ?? 0) * (displayTrip?.nights ?? session.tripState.nights) * (displayTrip?.roomCount ?? Math.ceil(travelers / 2));
     const total = attractions + transport + food + hotel;
     return { attractions, transport, food, hotel, total, remaining: (displayTrip?.budgetLimit ?? session.tripState.budgetLimit) - total };
   })();
+  const dayTabSummaries: Record<string, { total: number }> = {};
+  if (session && catalog) {
+    const updates = previewing && proposal ? proposal.updates ?? (proposal.targetRegionId !== 'all' ? [{ regionId: proposal.targetRegionId, nextUI: proposal.nextUI, nextData: proposal.nextData }] : []) : [];
+    const travelers = displayTrip?.travelers ?? 1;
+    const roomCount = displayTrip?.roomCount ?? Math.ceil(travelers / 2);
+    const nights = displayTrip?.nights ?? session.tripState.nights;
+    dayItems.forEach((item, index) => {
+      const itemDay = updates.find(update => update.regionId === item.region)?.nextData ?? session.tripState.days[item.key];
+      const places = itemDay.stops.map(stop => placeById(stop.placeId));
+      const attractions = places.reduce((sum, place) => sum + (place?.cost ?? 0), 0) * travelers;
+      const transport = places.reduce((sum, place) => sum + (place?.transportCost ?? 0), 0) * travelers;
+      const food = (catalog.pricing?.foodPerPersonDay ?? 180) * travelers;
+      const hotel = index < nights ? (selectedHotel?.nightlyPrice ?? 0) * roomCount : 0;
+      dayTabSummaries[item.key] = {
+        total: attractions + transport + food + hotel,
+      };
+    });
+  }
 
   const allCandidateUpdates = proposal && !staleProposal ? proposal.updates ?? [] : [];
   const combinedDays = session ? { ...session.tripState.days } : undefined;
@@ -569,15 +579,20 @@ export default function App() {
   const surfaceChecks = null;
   const generatedSurface = null;
 
-  const setupVisible = !loading && !connectionError && (showSetup || !session);
+  const guideVisible = activePage === 'guide';
+  const setupVisible = !guideVisible && !loading && !connectionError && (showSetup || !session);
 
-  return <div className={`app-shell ${setupVisible ? 'is-setup' : ''} ${editorMode ? 'editor-mode' : ''}`}>
+  return <div className={`app-shell ${setupVisible ? 'is-setup' : ''} ${guideVisible ? 'is-guide' : ''} ${editorMode ? 'editor-mode' : ''}`}>
     <header className="topbar"><div className="topbar-inner">
-      <a className="brand" href="#workspace" aria-label="旅序工作台"><span className="brand-symbol"><Compass size={25} strokeWidth={1.5} /></span><span className="brand-name">旅序<span className="brand-en">TRIP STUDIO</span></span></a>
-      <nav className="topbar-nav" aria-label="主导航"><span className="nav-context">工作台</span><span className="nav-divider">/</span><a className="nav-link active" href="#workspace">行程规划</a></nav>
-      <div className="topbar-actions">{session && !setupVisible && <button className="button secondary topbar-new-trip" aria-label="规划新行程" onClick={openTripSetup} disabled={!!busy || hasDrafts}><Plus size={16} /><span>新建行程</span></button>}<span className="demo-badge"><span className="status-dot" />{agentConfigured ? `规划服务 · ${agentStatus.provider || 'Agent'}` : agentDemo ? '演示生成 · 未接入模型' : 'Agent 待连接'}</span><button className="button ghost topbar-history" onClick={() => setHistoryOpen(true)} disabled={!session}><History size={16} />操作记录</button><button className="button secondary export-button" onClick={exportPlan} disabled={!session || !!busy}><ArrowDownToLine size={16} />导出计划</button></div>
+      <a className="brand" href="#workspace" data-testid="brand-home" aria-label="返回首页" onClick={event => { event.preventDefault(); if (setupVisible && !guideVisible) { document.querySelector<HTMLElement>('.page-container')?.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); return; } if (openTripSetup()) requestAnimationFrame(() => document.querySelector<HTMLElement>('.page-container')?.scrollTo({ top: 0, behavior: 'auto' })); }}><span className="brand-symbol"><Compass size={25} strokeWidth={1.5} /></span><span className="brand-name">旅序<span className="brand-en">TRIP STUDIO</span></span></a>
+      <nav className="topbar-nav" aria-label="主导航"><a className={`nav-link ${!guideVisible ? 'active' : ''}`} href="#workspace" aria-current={!guideVisible ? 'page' : undefined} onClick={event => { event.preventDefault(); setActivePage('planner'); }}><LayoutGrid size={14} />行程规划</a><a className={`nav-link ${guideVisible ? 'active' : ''}`} href="#guide" data-testid="guide-tab" aria-current={guideVisible ? 'page' : undefined} onClick={event => { event.preventDefault(); setActivePage('guide'); }}><BookOpen size={14} />指南</a></nav>
+      <div className="topbar-actions">
+        <button className={`button ghost mobile-guide-tab ${guideVisible ? 'active' : ''}`} type="button" aria-label={guideVisible ? '返回行程规划' : '打开指南'} onClick={() => setActivePage(guideVisible ? 'planner' : 'guide')}><BookOpen size={16} /><span>{guideVisible ? '规划' : '指南'}</span></button>
+        {session && !setupVisible && !guideVisible && <div className="topbar-workspace-actions" role="group" aria-label="行程操作"><button className="button secondary topbar-new-trip" aria-label="规划新行程" onClick={openTripSetup} disabled={!!busy || hasDrafts}><Plus size={16} /><span>新建行程</span></button><button className="button ghost topbar-history" aria-label="操作记录" onClick={() => setHistoryOpen(true)}><History size={16} /><span>操作记录</span></button><button className="button ghost export-button" aria-label="导出计划" onClick={exportPlan} disabled={!!busy}><ArrowDownToLine size={16} /><span>导出</span></button></div>}
+        <button className={`button secondary service-settings-button ${serviceConnectionClass}`} type="button" data-testid="service-settings-button" aria-label="打开服务接入" title={serviceConnectionTitle} onClick={() => openServiceSettings('model')}><Settings2 size={16} /><span>服务接入</span><i className="service-status-dot" aria-hidden="true" /></button>
+      </div>
     </div></header>
-    <main className="page-container" id="workspace">{setupVisible ? <TripSetup status={agentStatus} previous={session} busy={busy === '正在规划行程'} error={setupError} onSubmit={settings => void planTrip(settings)} onContinue={() => setShowSetup(false)} onDemo={() => void openDemoTrip()} onAbort={() => actionController.current?.abort()} /> : <>
+    <main className="page-container" id="workspace">{guideVisible ? catalog ? <GuidePage catalog={catalog} city={session?.tripState.city} onBack={() => setActivePage('planner')} /> : <section className="connection-state" role="status"><LoaderCircle className="spin" size={30} /><h2>正在打开指南</h2><p>载入路线与地点内容…</p></section> : setupVisible ? <TripSetup status={agentStatus} previous={session} busy={busy === '正在规划行程'} error={setupError} onSubmit={settings => void planTrip(settings)} onContinue={() => { setActivePage('planner'); setShowSetup(false); }} onDemo={settings => void openDemoTrip(settings)} onNeedModel={() => openServiceSettings('model')} onAbort={() => actionController.current?.abort()} /> : <>
       <section className={`trip-overview ${tripOverviewCollapsed ? 'is-collapsed' : ''}`} aria-label="行程概览" data-testid="trip-overview">
         <div className="hero" id="trip-overview-details" aria-hidden={tripOverviewCollapsed}>
           <div className="hero-copy"><div className="hero-eyebrow"><Leaf size={14} /><span>慢一点，遇见更多风景</span></div><h1>{session?.tripState.city || '你的下一站'}，<span>{dayItems.length ? `${dayItems.length} 天，按你的节奏。` : '从这里出发。'}</span></h1><p>行程随你调整，每一次修改都有迹可循。</p><div className="trip-chips"><span className="chip"><CalendarDays size={14} />{dayItems.length} 天 {displayTrip?.nights ?? 0} 晚</span><span className="chip"><MapPin size={14} />{displayTrip?.city || '目的地待选择'} · {displayTrip?.travelers ?? 1} 人</span><span className="chip"><Wallet size={14} />预算 {money(displayTrip?.budgetLimit ?? 2600)}</span></div></div>
@@ -601,12 +616,11 @@ export default function App() {
           </div>}
           {!!(session.planningWarnings ?? session.planningSettings?.warnings)?.length && <div className="planning-notices" role="status">{[...new Set(session.planningWarnings ?? session.planningSettings?.warnings)].map((warning, index) => <p key={index}>{warning}</p>)}</div>}
           <div className="section-heading"><div><span className="section-eyebrow">YOUR ITINERARY</span><h2>把时间留给喜欢的事</h2></div><span className="saved-state"><CheckCircle2 size={14} />{busy ? '保存 / 处理中' : previewing ? '候选尚未应用' : hasDrafts ? '有尚未保存的输入' : '修改已保存'}</span></div>
-          <div className="editor-workspace-toolbar" aria-label="局部编辑模式"><div><ShieldCheck size={16} /><strong>局部编辑</strong><span>{editorMode ? '选择页面组件，查看可信修改范围' : '保留原交互，按需开启选区'}</span></div><div role="group" aria-label="切换页面模式"><button aria-pressed={!editorMode} disabled={!!busy} onClick={() => setEditingMode(false)}>浏览</button><button aria-pressed={editorMode} disabled={!!busy} onClick={() => setEditingMode(true)} data-testid="edit-mode-toggle">编辑</button></div></div>
-          <div className="day-tabs" role="tablist" aria-label="选择行程日期">{dayItems.map(item => <button key={item.key} id={`tab-${item.key}`} role="tab" aria-selected={selectedDay === item.key} aria-controls={`panel-${item.key}`} className={`day-tab ${selectedDay === item.key ? 'active' : ''}`} onClick={() => changeDay(item.key, item.region)} disabled={!!busy}><span className="day-tab-number">{item.number}</span><span>{item.label}<small>{session.tripState.days[item.key].date}</small></span>{(session.controlState.lockedRegions.includes(item.region) || isComponentLocked(session, bindingFor(session, item.key)?.componentId, false)) && <LockKeyhole size={13} />}</button>)}</div>
-          {dayItems.length > 1 && <div className="style-reuse-toolbar"><span>让喜欢的页面样式用于其他日期</span><button className="button secondary" data-testid="copy-day-style" onClick={openStyleCopy} disabled={!!busy || hasDrafts || previewing}><LayoutGrid size={14} />复用当前页面样式</button></div>}
+          <div className="editor-workspace-toolbar" aria-label="工作模式"><div><ShieldCheck size={16} /><strong>工作模式</strong><span>{editorMode ? '选择组件，使用右侧手动编辑工具' : '查看行程，或让右侧 Agent 帮你调整'}</span></div><div role="group" aria-label="切换工作模式"><button aria-pressed={!editorMode} disabled={!!busy} onClick={() => setEditingMode(false)} data-testid="browse-mode-toggle">浏览模式</button><button aria-pressed={editorMode} disabled={!!busy} onClick={() => setEditingMode(true)} data-testid="edit-mode-toggle">手动编辑</button></div></div>
+          <div className="day-tabs" role="tablist" aria-label="选择行程日期">{dayItems.map(item => { const summary = dayTabSummaries[item.key]; return <button key={item.key} id={`tab-${item.key}`} role="tab" aria-selected={selectedDay === item.key} aria-controls={`panel-${item.key}`} className={`day-tab ${selectedDay === item.key ? 'active' : ''}`} onClick={() => changeDay(item.key, item.region)} disabled={!!busy}><span className="day-tab-number">{item.number}</span><span className="day-tab-copy"><strong>{item.label}</strong><small>{session.tripState.days[item.key].date}</small></span>{summary && <span className="day-tab-budget">{money(summary.total)}</span>}{(session.controlState.lockedRegions.includes(item.region) || isComponentLocked(session, bindingFor(session, item.key)?.componentId, false)) && <LockKeyhole size={13} />}</button>; })}</div>
           {day && ui && <div data-testid={previewing ? 'candidate-preview-region' : undefined}><section className={`day-panel ${regionLocked ? 'is-locked' : ''} ${previewing ? 'is-candidate-preview' : ''}`} id={`panel-${selectedDay}`} data-testid={`region-${activeRegion}`} data-preview={previewing ? 'true' : 'false'} data-candidate-id={previewing ? proposal.proposalId : undefined} role="tabpanel" aria-labelledby={`tab-${selectedDay}`} {...selectionAttributes(activeDayBinding, editorMode, selectedComponentId, isComponentLocked(session, activeDayBinding?.componentId), selectEditorComponent)}>
-            <div className="day-panel-header"><div><span className="panel-eyebrow">DAY {dayItem.number}<span className="eyebrow-line" /></span><h3>{day.title}</h3><p>{day.stops.length} 个停留点<span>·</span>按自己的节奏，慢慢走</p></div>{previewing ? <span className="preview-readonly-status"><ShieldCheck size={14} />只读预览</span> : <button className={`button lock-button ${regionLocked ? 'locked' : 'ghost'}`} title="锁定后禁止生成修改；你仍可主动编辑备注、时间和景点。" aria-label={`${regionLocked ? '解锁' : '锁定'}${dayItem.label}的生成修改`} aria-pressed={regionLocked} onClick={() => toggleLock(activeRegion, !regionLocked)} disabled={!!busy}>{regionLocked ? <LockKeyhole size={15} /> : <UnlockKeyhole size={15} />}{regionLocked ? '生成修改已锁定' : '锁定生成修改'}</button>}</div>
-            {previewing ? <div className="day-toolbar preview-toolbar"><span><LayoutGrid size={14} />{ui.view === 'timeline' ? '时间轴展示' : '卡片展示'} · {ui.compact ? '精简信息' : '完整信息'}</span><span>{candidateUpdate ? '本日包含候选修改' : '本日不在修改范围内，显示原有内容'}</span></div> : <div className="day-toolbar"><span className="weather-note"><Sun size={15} />真实地点 · 费用为预算估算</span><button className="button secondary route-refresh-button" data-testid="refresh-day-routes" aria-label={`${dayItem.label}添加或刷新交通与地图`} disabled={!!busy || hasDrafts} onClick={() => void refreshRoutes(activeRegion)}>{busy === '正在查询路线' ? <LoaderCircle className="spin" size={14} /> : <MapPin size={14} />}{busy === '正在查询路线' ? '正在查询…' : ui.showMap || ui.showTransport ? '刷新交通与地图' : '添加交通与地图'}</button><div className="view-switch" aria-label="展示方式"><button className={ui.view === 'cards' ? 'active' : ''} onClick={() => previewView('cards')} disabled={!!busy || regionLocked || dayComponentLocked || ui.view === 'cards' || hasDrafts} aria-label="预览卡片展示"><LayoutGrid size={14} />卡片</button><button className={ui.view === 'timeline' ? 'active' : ''} onClick={() => previewView('timeline')} disabled={!!busy || regionLocked || dayComponentLocked || ui.view === 'timeline' || hasDrafts} aria-label="预览时间轴展示"><Clock3 size={14} />时间轴</button></div></div>}
+            <div className="day-panel-header"><div><span className="panel-eyebrow">DAY {dayItem.number}<span className="eyebrow-line" /></span><h3>{day.title}</h3><p>{day.stops.length} 个停留点<span>·</span>按自己的节奏，慢慢走</p></div>{previewing ? <span className="preview-readonly-status"><ShieldCheck size={14} />只读预览</span> : <button className={`icon-button generation-lock-button ${regionLocked ? 'locked' : ''}`} title={regionLocked ? '解除本日生成锁定' : '锁定本日生成修改'} aria-label={`${regionLocked ? '解锁' : '锁定'}${dayItem.label}的生成修改`} aria-pressed={regionLocked} onClick={() => toggleLock(activeRegion, !regionLocked)} disabled={!!busy}>{regionLocked ? <LockKeyhole size={15} /> : <UnlockKeyhole size={15} />}</button>}</div>
+            {previewing ? <div className="day-toolbar preview-toolbar"><span><LayoutGrid size={14} />{ui.view === 'timeline' ? '时间轴展示' : '卡片展示'} · {ui.compact ? '精简信息' : '完整信息'}</span><span>{candidateUpdate ? '本日包含候选修改' : '本日不在修改范围内，显示原有内容'}</span></div> : <div className="day-toolbar"><span className="weather-note"><Sun size={15} />费用为预算估算</span><button className="button secondary route-refresh-button" data-testid="refresh-day-routes" aria-label={`${dayItem.label}添加或刷新交通与地图`} disabled={!!busy || hasDrafts} onClick={() => void refreshRoutes(activeRegion)}>{busy === '正在查询路线' ? <LoaderCircle className="spin" size={14} /> : <MapPin size={14} />}{busy === '正在查询路线' ? '正在查询…' : ui.showMap || ui.showTransport ? '刷新交通与地图' : '添加交通与地图'}</button><div className="view-switch" aria-label="展示方式"><button className={ui.view === 'cards' ? 'active' : ''} onClick={() => previewView('cards')} disabled={!!busy || regionLocked || dayComponentLocked || ui.view === 'cards' || hasDrafts} aria-label="预览卡片展示"><LayoutGrid size={14} />卡片</button><button className={ui.view === 'timeline' ? 'active' : ''} onClick={() => previewView('timeline')} disabled={!!busy || regionLocked || dayComponentLocked || ui.view === 'timeline' || hasDrafts} aria-label="预览时间轴展示"><Clock3 size={14} />时间轴</button></div></div>}
             {ui.surface?.placement === 'beforeStops' && generatedSurface}
             {ui.surface && <p className="editor-legacy-notice" role="status">旧版生成代码已保留但不会执行；当前显示可信原生行程卡片。</p>}
             {<>
@@ -633,10 +647,13 @@ export default function App() {
             {previewing ? <div className="day-note preview-day-note"><span className="field-label">这一天的备注</span><p>{day.note || '尚未填写备注'}</p></div> : <div className="day-note"><label className="field-label" htmlFor={`note-${selectedDay}`}><span><Plus size={14} />给这一天留个备注</span><small>移开输入框后保存</small></label><textarea id={`note-${selectedDay}`} key={`note-${selectedDay}`} rows={2} maxLength={2000} value={noteDrafts[selectedDay] ?? day.note} aria-label={`${dayItem.label}行程备注`} placeholder="例如：下午留些时间喝茶，节奏不用太赶。" onChange={event => { setNoteDrafts(drafts => ({ ...drafts, [selectedDay]: event.target.value })); markEdited(); }} onBlur={() => saveNote(selectedDay, activeRegion)} disabled={!!busy || dayComponentLocked} /></div>}
             <div className="day-panel-footer"><ShieldCheck size={14} /><span>{previewing ? '当前仅预览候选，原有行程与输入尚未改变。' : dayComponentLocked ? '本日持久组件锁已生效，请先解除锁定再修改。' : regionLocked ? '本区域已保护：生成不会修改；直接操作仍由你决定。' : '界面与行程数据分别保存，切换展示仍可继续操作。'}</span><span className="region-id">{activeRegion}</span></div>
           </section></div>}
-          <div className="details-grid"><section className="hotel-card"><div className="card-heading"><span className="card-icon"><MapPin size={18} /></span><h3>住得舒服一点</h3>{previewing ? <span className="preview-readonly-status">{proposal?.nextTrip?.hotelId ? '候选酒店，尚未应用' : '原有选择保留'}</span> : <button className={`icon-button ${session.controlState.hotelLocked ? 'locked' : ''}`} aria-label={session.controlState.hotelLocked ? '解锁酒店选择' : '锁定酒店选择'} aria-pressed={session.controlState.hotelLocked} title="锁定后保留当前酒店选择" disabled={!!busy} onClick={() => toggleLock('hotel', !session.controlState.hotelLocked)}>{session.controlState.hotelLocked ? <LockKeyhole size={16} /> : <UnlockKeyhole size={16} />}</button>}</div>{previewing ? <p className="preview-hotel-name">{selectedHotel?.name}</p> : <><label className="sr-only" htmlFor="hotel-select">选择酒店</label><div className="select-wrap"><select id="hotel-select" value={session.tripState.hotelId} disabled={!!busy || session.controlState.hotelLocked} onChange={event => direct({ kind: 'hotel', value: event.target.value }, '酒店选择已保存，住宿预算同步更新。')}>{catalog.hotels.map(hotel => <option key={hotel.id} value={hotel.id}>{hotel.name}</option>)}</select><ChevronDown size={15} /></div></>}<p className="hotel-description">{selectedHotel?.description}</p>{selectedHotel?.address && <p className="place-address hotel-address"><MapPin size={12} /><span>{selectedHotel.address}</span></p>}{officialLink(selectedHotel?.sourceUrl) && <a className="place-source-link" href={officialLink(selectedHotel?.sourceUrl)} target="_blank" rel="noopener noreferrer">{selectedHotel?.sourceName || '酒店官方信息'}<ArrowUpRight size={12} /></a>}<div className="hotel-bottom"><span>{selectedHotel?.location}<small>入住 {displayTrip?.nights ?? session.tripState.nights} 晚 · {displayTrip?.roomCount ?? Math.ceil((displayTrip?.travelers ?? 1) / 2)} 间</small></span><strong><span className="hotel-price-label">住宿预算估算</span>{money(selectedHotel?.nightlyPrice ?? 0)}<small> / 晚</small></strong></div>{session.controlState.hotelLocked && <p className="inline-lock"><LockKeyhole size={12} />酒店选择已锁定</p>}</section>
-          <section data-testid="budget-card" className={`budget-card ${displayDerived.remaining < 0 ? 'over-budget' : ''}`}><div className="card-heading"><span className="card-icon"><Wallet size={18} /></span><h3>每一笔，都心中有数</h3><span className="budget-caption">预算估算</span></div><div className="budget-overview"><strong data-testid="budget-total">{money(displayDerived.total)}</strong><label htmlFor="budget-limit">/ 预算 ¥{previewing ? <span className="preview-budget-limit">{displayTrip?.budgetLimit}</span> : <input id="budget-limit" aria-label="总预算上限" type="number" inputMode="numeric" min={100} max={100000} value={budgetDraft} onChange={event => { setBudgetDraft(event.target.value); markEdited(); }} onBlur={saveBudget} onKeyDown={event => { if (event.key === 'Enter') event.currentTarget.blur(); }} disabled={!!busy} />}</label></div><div className="budget-progress" role="progressbar" aria-label="预算使用比例" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.min(100, Math.round(displayDerived.total / (displayTrip?.budgetLimit ?? session.tripState.budgetLimit) * 100))}><span style={{ width: `${Math.min(100, displayDerived.total / (displayTrip?.budgetLimit ?? session.tripState.budgetLimit) * 100)}%` }} /></div>{session.presentationSettings?.showBudgetDetails !== false && <div className="budget-breakdown" data-testid="budget-breakdown"><span><i className="dot hotel-dot" />住宿<strong>{money(displayDerived.hotel)}</strong></span><span><i className="dot ticket-dot" />门票<strong>{money(displayDerived.attractions)}</strong></span><span><i className="dot transport-dot" />交通<strong>{money(displayDerived.transport)}</strong></span><span><i className="dot food-dot" />餐饮<strong>{money(displayDerived.food)}</strong></span></div>}<p className="budget-remaining">{displayDerived.remaining < 0 ? `已超出预算 ${money(-displayDerived.remaining)}，可以调整酒店或景点。` : `还留有 ${money(displayDerived.remaining)} 的从容空间。`}</p></section></div>
+          <div className="details-grid"><section className="hotel-card"><div className="card-heading"><span className="card-icon"><MapPin size={18} /></span><h3>住得舒服一点</h3>{previewing ? <span className="preview-readonly-status">{proposal?.nextTrip?.hotelId ? '候选酒店，尚未应用' : '原有选择保留'}</span> : <button className={`icon-button ${session.controlState.hotelLocked ? 'locked' : ''}`} aria-label={session.controlState.hotelLocked ? '解锁酒店选择' : '锁定酒店选择'} aria-pressed={session.controlState.hotelLocked} title="锁定后保留当前酒店选择" disabled={!!busy} onClick={() => toggleLock('hotel', !session.controlState.hotelLocked)}>{session.controlState.hotelLocked ? <LockKeyhole size={16} /> : <UnlockKeyhole size={16} />}</button>}</div>{previewing ? <p className="preview-hotel-name">{selectedHotel?.name}</p> : <><label className="sr-only" htmlFor="hotel-select">选择酒店</label><div className="select-wrap"><select id="hotel-select" value={session.tripState.hotelId} disabled={!!busy || session.controlState.hotelLocked} onChange={event => direct({ kind: 'hotel', value: event.target.value }, '酒店选择已保存，住宿预算同步更新。')}>{hotelGroups.map(group => <optgroup label={group.label} key={group.label}>{group.hotels.map(hotel => <option key={hotel.id} value={hotel.id}>{hotel.name} · {money(hotel.nightlyPrice)}/晚</option>)}</optgroup>)}</select><ChevronDown size={15} /></div></>}<p className="hotel-description">{selectedHotel?.description}</p>{selectedHotel?.address && <p className="place-address hotel-address"><MapPin size={12} /><span>{selectedHotel.address}</span></p>}{officialLink(selectedHotel?.sourceUrl) && <a className="place-source-link" href={officialLink(selectedHotel?.sourceUrl)} target="_blank" rel="noopener noreferrer">{selectedHotel?.sourceName || '酒店官方信息'}<ArrowUpRight size={12} /></a>}<div className="hotel-bottom"><span>{selectedHotel?.location}<small>入住 {displayTrip?.nights ?? session.tripState.nights} 晚 · {displayTrip?.roomCount ?? Math.ceil((displayTrip?.travelers ?? 1) / 2)} 间</small></span><strong><span className="hotel-price-label">住宿预算估算</span>{money(selectedHotel?.nightlyPrice ?? 0)}<small> / 晚</small>{selectedHotel?.nightlyPriceRange && <small className="hotel-price-range">常规规划区间 {money(selectedHotel.nightlyPriceRange[0])}–{money(selectedHotel.nightlyPriceRange[1])}</small>}</strong></div>{selectedHotel?.priceNote && <p className="hotel-price-note">{selectedHotel.priceNote}</p>}{session.controlState.hotelLocked && <p className="inline-lock"><LockKeyhole size={12} />酒店选择已锁定</p>}</section>
+          <section data-testid="budget-card" className={`budget-card ${displayDerived.remaining < 0 ? 'over-budget' : ''}`}><div className="card-heading"><span className="card-icon"><Wallet size={18} /></span><h3>每一笔，都心中有数</h3><span className="budget-caption">预算估算</span></div><div className="budget-overview"><strong data-testid="budget-total">{money(displayDerived.total)}</strong><label htmlFor="budget-limit">/ 预算 ¥{previewing ? <span className="preview-budget-limit">{displayTrip?.budgetLimit}</span> : <input id="budget-limit" aria-label="总预算上限" type="number" inputMode="numeric" min={100} max={100000} value={budgetDraft} onChange={event => { setBudgetDraft(event.target.value); markEdited(); }} onBlur={saveBudget} onKeyDown={event => { if (event.key === 'Enter') event.currentTarget.blur(); }} disabled={!!busy} />}</label></div><div className="budget-progress" role="progressbar" aria-label="预算使用比例" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.min(100, Math.round(displayDerived.total / (displayTrip?.budgetLimit ?? session.tripState.budgetLimit) * 100))}><span style={{ width: `${Math.min(100, displayDerived.total / (displayTrip?.budgetLimit ?? session.tripState.budgetLimit) * 100)}%` }} /></div>{session.presentationSettings?.showBudgetDetails !== false && <div className="budget-breakdown" data-testid="budget-breakdown"><span><i className="dot hotel-dot" />住宿<strong>{money(displayDerived.hotel)}</strong></span><span><i className="dot ticket-dot" />门票<strong>{money(displayDerived.attractions)}</strong></span><span><i className="dot transport-dot" />交通<strong>{money(displayDerived.transport)}</strong></span><span><i className="dot food-dot" />餐饮<strong>{money(displayDerived.food)}</strong></span></div>}<p className="budget-remaining">{displayDerived.remaining < 0 ? `已超出预算 ${money(-displayDerived.remaining)}，可以调整酒店或景点。` : `还留有 ${money(displayDerived.remaining)} 的从容空间。`}</p>{catalog.pricing?.notice && <p className="budget-pricing-note">{catalog.pricing.notice}</p>}</section></div>
         </div>
-        <aside className="control-panel" data-testid="agent-scroll" aria-label="AI 修改与候选方案" tabIndex={0}><LocalEditor session={session} mode={editorMode} selectedId={selectedComponentId} busy={!!busy || hasDrafts} onModeChange={setEditingMode} onSelect={selectEditorComponent} onLock={lockEditorComponent} onApply={applyEditorPatch} onDisplay={applyEditorDisplay} onError={error => void recoverError(error)} /><GlobalControls session={session} busy={!!busy} hasDrafts={hasDrafts} onPresentation={applyGlobalPresentation} onConstraint={applyBudgetConstraint} /><CandidatePanel session={session} catalog={catalog} selectedId={selectedComponentId} editorMode={editorMode} busy={!!busy} hasDrafts={hasDrafts} onCommit={applyEditCandidate} onConflict={error => void recoverError(error)} />
+        <aside className={`control-panel ${editorMode ? 'manual-control-panel' : 'browse-control-panel'}`} data-testid="agent-scroll" aria-label={editorMode ? '手动编辑工具' : 'Agent 行程对话'} tabIndex={0}>{editorMode ? <>
+          <LocalEditor session={session} mode={editorMode} selectedId={selectedComponentId} busy={!!busy || hasDrafts} onSelect={selectEditorComponent} onLock={lockEditorComponent} onApply={applyEditorPatch} onDisplay={applyEditorDisplay} onError={error => void recoverError(error)} />
+          <GlobalControls session={session} busy={!!busy} hasDrafts={hasDrafts} onPresentation={applyGlobalPresentation} onConstraint={applyBudgetConstraint} />
+          <CandidatePanel key={`manual-candidate-${serviceRevision}`} session={session} catalog={catalog} selectedId={selectedComponentId} editorMode={editorMode} busy={!!busy} hasDrafts={hasDrafts} onCommit={applyEditCandidate} onConflict={error => void recoverError(error)} onNeedModel={() => openServiceSettings('model')} />
           {proposal ? <section ref={proposalPanel} id="proposal-comparison" className={`proposal-card ${staleProposal ? 'is-stale' : ''}`} aria-live="polite" data-testid="candidate-comparison">
             <div className="proposal-heading"><span><CheckCircle2 size={16} />{staleProposal ? '方案需要重新预览' : candidateOptions.length === 1 ? '1 个修改方案' : `${candidateOptions.length} 个候选界面`}</span><span className="badge">{candidateOptions.length === 1 ? '待确认应用' : '待选择应用'}</span></div>
             <p className="candidate-intro">{candidateOptions.length === 1 ? '左侧展示本次修改方案，确认效果后可应用。' : '选择候选可在左侧查看实际界面。所有方案都以当前已保存的行程为基础。'}</p>
@@ -651,7 +668,8 @@ export default function App() {
             {surfaceErrors[proposal.proposalId] && <div className="proposal-warning" role="alert"><p>生成界面运行失败：{surfaceErrors[proposal.proposalId]}</p><button className="button secondary" disabled={!!busy || staleProposal} onClick={() => void repairSurface(surfaceErrors[proposal.proposalId])}><RefreshCw size={14} />让Agent修复</button></div>}
             <div className="proposal-actions"><button className="button primary" onClick={() => void applyProposal()} disabled={!!busy || staleProposal || !!surfaceErrors[proposal.proposalId] || !allSurfacesReady}><Check size={15} />{allSurfacesReady ? '应用这次修改' : '正在检查生成界面…'}</button><button className="button ghost" disabled={!!busy} onClick={cancelProposal}>取消</button></div>
           </section> : null}
-          <div className="control-footer"><div className="control-trust"><ShieldCheck size={16} /><span>锁定可保护 · 修改可预览 · 操作可撤销</span></div><button className="button secondary all-route-button" data-testid="refresh-all-routes" aria-label="为全部日期添加或刷新交通与地图" disabled={!!busy || hasDrafts || previewing} onClick={() => void refreshRoutes('all')}>{busy === '正在查询路线' ? <LoaderCircle className="spin" size={15} /> : <Bus size={15} />}查询全部日期交通与地图</button>{busy === '正在查询路线' && <p className="route-query-progress" role="status">正在核实地点并查询交通路线，已有输入会保留。</p>}<button className="button secondary undo-button" onClick={() => { markEdited(); void mutate('正在撤销', (current, signal) => api.undo(current.id, current.version, signal), '已在新版本恢复上一步的数据、展示、组件锁与硬约束。', true); }} disabled={!!busy || !session.canUndo || hasDrafts || previewing}><RotateCcw size={15} />撤销上一步</button><p className="undo-semantics">撤销将同步恢复上一个版本的数据、展示、组件锁和硬约束，并创建新版本。</p><button className="button ghost mobile-history" onClick={() => setHistoryOpen(true)}><History size={15} />查看操作记录</button><p className="demo-note">{agentDemo ? '当前使用显式演示模式，不会调用真实模型。' : '候选仅生成受限 Patch；旧生成代码不会执行。路线与行程保存由后台提供。'}景点与酒店均采用真实地点；费用为预算估算，实际票价、房价和开放情况以官方为准。交通路线来自地图查询。</p></div>
+          <div className="control-footer"><div className="control-trust"><ShieldCheck size={16} /><span>锁定可保护 · 修改可预览 · 操作可撤销</span></div><button className="button secondary all-route-button" data-testid="refresh-all-routes" aria-label="为全部日期添加或刷新交通与地图" disabled={!!busy || hasDrafts || previewing} onClick={() => void refreshRoutes('all')}>{busy === '正在查询路线' ? <LoaderCircle className="spin" size={15} /> : <Bus size={15} />}查询全部日期交通与地图</button>{busy === '正在查询路线' && <p className="route-query-progress" role="status">正在核实地点并查询交通路线，已有输入会保留。</p>}<button className="button secondary undo-button" onClick={() => { markEdited(); void mutate('正在撤销', (current, signal) => api.undo(current.id, current.version, signal), '已在新版本恢复上一步的数据、展示、组件锁与硬约束。', true); }} disabled={!!busy || !session.canUndo || hasDrafts || previewing}><RotateCcw size={15} />撤销上一步</button><p className="undo-semantics">撤销将同步恢复上一个版本的数据、展示、组件锁和硬约束，并创建新版本。</p><button className="button ghost mobile-history" onClick={() => setHistoryOpen(true)}><History size={15} />查看操作记录</button><p className="demo-note">{agentDemo ? '当前使用演示模式，不会调用模型。' : '候选仅生成受限 Patch；旧生成代码不会执行。路线与行程保存由后台提供。'}费用为预算估算，实际票价、房价和开放情况以官方为准。交通路线来自地图查询。</p></div>
+        </> : <CandidatePanel key={`browse-conversation-${serviceRevision}`} variant="conversation" session={session} catalog={catalog} selectedId={activeDayBinding?.componentId ?? null} editorMode={false} busy={!!busy} hasDrafts={hasDrafts} onCommit={applyEditCandidate} onConflict={error => void recoverError(error)} onNeedModel={() => openServiceSettings('model')} />}
         </aside>
       </div>
       {surfaceChecks}
@@ -659,8 +677,8 @@ export default function App() {
       </>}
     </>}</main>
     <div className="toast-stack" role="status" aria-live="polite">{toasts.map(toast => <div className={`toast ${toast.kind}`} key={toast.id}>{toast.kind === 'success' ? <CheckCircle2 size={17} /> : <ShieldCheck size={17} />}<span>{toast.message}</span><button aria-label="关闭提示" onClick={() => setToasts(items => items.filter(item => item.id !== toast.id))}><X size={14} /></button></div>)}</div>
+    {serviceSettingsOpen && <Overlay className="service-settings-dialog" label="服务接入" onClose={() => setServiceSettingsOpen(false)}><ServiceSettings target={serviceSettingsTarget} onClose={() => setServiceSettingsOpen(false)} onChanged={integrationChanged} /></Overlay>}
     {historyOpen && session && <Overlay className="history-drawer" label="操作记录" onClose={() => { if (!busyRef.current) setHistoryOpen(false); }}><div className="drawer-header"><div><span className="panel-eyebrow">VERSION JOURNAL</span><h2>每一次修改，都有记录</h2></div><button className="icon-button" aria-label="关闭操作记录" disabled={!!busy} onClick={() => setHistoryOpen(false)}><X size={20} /></button></div><VersionHistory session={session} busy={!!busy || hasDrafts} onRestore={restoreSavedVersion} /><button className="button secondary drawer-close" disabled={!!busy} onClick={() => setHistoryOpen(false)}><ArrowLeft size={15} />返回行程</button></Overlay>}
-    {copyStyleOpen && session && <Overlay className="confirm-dialog copy-style-dialog" label="复用当前页面样式" onClose={() => { if (!busyRef.current) setCopyStyleOpen(false); }}><span className="dialog-icon"><LayoutGrid size={23} /></span><h2>复用{dayItem.label}的页面样式</h2><p>选择目标日期，先生成预览再应用。各天原有的景点、时间、备注和行程数据会保留。</p><div className="copy-style-targets">{dayItems.filter(item => item.region !== activeRegion).map(item => { const locked = session.controlState.lockedRegions.includes(item.region); return <label key={item.region}><input type="checkbox" disabled={!!busy || locked} checked={copyTargets.includes(item.region)} onChange={event => setCopyTargets(current => event.target.checked ? [...current, item.region] : current.filter(value => value !== item.region))} /><span><strong>{item.label}</strong><small>{session.tripState.days[item.key].date}{locked ? ' · 已锁定，请先解锁' : ''}</small></span></label>; })}</div><div className="dialog-actions"><button className="button secondary" disabled={!!busy} onClick={() => setCopyStyleOpen(false)}>取消</button><button className="button primary" disabled={!!busy || !copyTargets.length} onClick={() => void previewStyleCopy()}>{busy ? <LoaderCircle className="spin" size={15} /> : <LayoutGrid size={15} />}{busy ? '正在准备预览…' : '预览样式复用'}</button></div></Overlay>}
     {resetOpen && <Overlay className="confirm-dialog" label="确认重置行程" onClose={() => { if (!busyRef.current) setResetOpen(false); }}><span className="dialog-icon"><RefreshCw size={24} /></span><h2>从最初的行程重新开始？</h2><p>当前行程、界面设置和锁定将恢复为本次规划的初始版本。尚未保存的输入也会清除。</p><div className="dialog-actions"><button className="button secondary" disabled={!!busy} onClick={() => setResetOpen(false)}>保留当前行程</button><button className="button primary" disabled={!!busy} onClick={() => { markEdited(); void mutate('正在重置', (current, signal) => api.reset(current.id, current.version, signal), '已恢复本次规划的初始行程。', true).then(ok => { if (ok) { setResetOpen(false); setProposal(null); setInstruction(''); setSelectedDay(sessionDayItems(sessionRef.current)[0]?.key ?? 'day1'); setTargetRegion(sessionDayItems(sessionRef.current)[0]?.region ?? 'day-1'); } }); }}>{busy ? '正在重置…' : '确认重置'}</button></div></Overlay>}
   </div>;
 }

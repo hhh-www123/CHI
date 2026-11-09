@@ -183,15 +183,15 @@ export function GeneratedSurfaceView(props: GeneratedSurfaceProps) {
     setMapImage('');
     if (!needsMap) { setMapMessage(''); return () => controller.abort(); }
     if (!route?.points.some(point => point.status === 'resolved') || !['ready', 'partial'].includes(route.status)) {
-      setMapMessage(route?.message || '尚未查询真实路线，请在主页面查询交通与地图。'); return () => controller.abort();
+      setMapMessage(route?.message || '尚未查询路线，请在主页面查询交通与地图。'); return () => controller.abort();
     }
-    setMapMessage('正在载入真实路线地图…');
+    setMapMessage('正在载入路线地图…');
     const base = `/api/sessions/${encodeURIComponent(session.id)}`;
     const path = proposalId ? `${base}/proposals/${encodeURIComponent(proposalId)}/map/${region}?v=${session.version}` : `${base}/map/${region}?v=${session.version}`;
     void fetch(path, { credentials: 'same-origin', signal: controller.signal }).then(async response => {
       if (!response.ok || !response.headers.get('content-type')?.startsWith('image/')) throw new Error('地图图片暂时无法载入');
       const image = await response.blob(); if (image.size > 4_000_000) throw new Error('地图图片过大'); return readMapImage(image);
-    }).then(value => { if (!controller.signal.aborted) { setMapImage(value); setMapIdentity(routeIdentity); setMapMessage(''); } }).catch(() => { if (!controller.signal.aborted) setMapMessage('地图暂时无法载入，真实景点和路线数据仍已保留。'); });
+    }).then(value => { if (!controller.signal.aborted) { setMapImage(value); setMapIdentity(routeIdentity); setMapMessage(''); } }).catch(() => { if (!controller.signal.aborted) setMapMessage('地图暂时无法载入，景点和路线数据仍已保留。'); });
     return () => controller.abort();
   }, [routeIdentity, needsMap]);
 

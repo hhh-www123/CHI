@@ -2,11 +2,51 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import json
 import os
 from pathlib import Path
+import threading
 from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parent.parent
+_RUNTIME_KEYS = {"AGENT_MODE", "CANDIDATE_AGENT_MODE", "LLM_API_KEY", "LLM_BASE_URL", "LLM_MODEL", "LLM_MODEL_LABEL", "AMAP_KEY"}
+_RUNTIME_LOCK = threading.RLock()
+
+
+def runtime_config_path() -> Path:
+    data_dir = Path(os.environ.get("TRAVEL_GENUI_DATA_DIR", ROOT / "backend" / ".runtime"))
+    return data_dir / "integrations.json"
+
+
+def runtime_values() -> dict[str, str]:
+    path = runtime_config_path()
+    with _RUNTIME_LOCK:
+        if not path.is_file():
+            return {}
+        try:
+            raw = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError, TypeError):
+            return {}
+    if not isinstance(raw, dict):
+        return {}
+    return {key: value for key, value in raw.items() if key in _RUNTIME_KEYS and isinstance(value, str)}
+
+
+def update_runtime_values(updates: dict[str, str]) -> None:
+    if not updates or any(key not in _RUNTIME_KEYS or not isinstance(value, str) for key, value in updates.items()):
+        raise ValueError("运行时配置包含不支持的字段。")
+    path = runtime_config_path()
+    with _RUNTIME_LOCK:
+        current = runtime_values()
+        current.update(updates)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        temporary = path.with_suffix(".tmp")
+        temporary.write_text(json.dumps(current, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        try:
+            temporary.chmod(0o600)
+        except OSError:
+            pass
+        temporary.replace(path)
 
 
 def _values() -> dict[str, str]:
@@ -23,6 +63,7 @@ def _values() -> dict[str, str]:
                 value = value[1:-1]
             result[key] = value
     result.update(os.environ)
+    result.update(runtime_values())
     return result
 
 
@@ -31,6 +72,18 @@ def _number(values: dict[str, str], key: str, default: float, minimum: float, ma
         return max(minimum, min(maximum, float(values.get(key, str(default)))))
     except ValueError:
         return default
+
+
+def normalize_llm_base_url(value: str) -> str:
+    base = value.strip().rstrip("/")
+    if base.endswith("/chat/completions"):
+        base = base[:-len("/chat/completions")].rstrip("/")
+    parsed = urlsplit(base)
+    if (not base or len(base) > 2048 or parsed.scheme not in {"https", "http"} or not parsed.hostname
+            or parsed.username or parsed.password or parsed.query or parsed.fragment
+            or any(ord(character) < 32 for character in base)):
+        raise ValueError("模型请求地址必须是有效的 HTTP(S) 基础地址。")
+    return base
 
 
 @dataclass(frozen=True)
@@ -54,10 +107,7 @@ class Settings:
 
 def get_settings() -> Settings:
     values = _values()
-    base = values.get("LLM_BASE_URL", "https://api.deepseek.com").rstrip("/")
-    parsed = urlsplit(base)
-    if parsed.scheme not in {"https", "http"} or not parsed.hostname or parsed.username or parsed.password or parsed.query or parsed.fragment:
-        raise ValueError("LLM_BASE_URL 必须是服务端配置的有效 HTTP(S) 接口地址。")
+    base = normalize_llm_base_url(values.get("LLM_BASE_URL", "https://api.deepseek.com"))
     mode = values.get("AGENT_MODE", "llm").strip().lower()
     if mode not in {"demo", "llm"}:
         raise ValueError("AGENT_MODE 只支持 llm 或 demo。")

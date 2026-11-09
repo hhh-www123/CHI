@@ -62,7 +62,7 @@ def resolve_scope(session: dict, selected_component_ids: list[str], fields: list
         deny("INVALID_REQUEST", "字段选择必须是受支持字段组成的字符串列表。")
     chosen_fields = list(DEFAULT_EDITABLE_FIELDS if fields is None else fields)
     if not chosen_fields or len(chosen_fields) != len(set(chosen_fields)) or any(field not in EDITABLE_FIELDS for field in chosen_fields):
-        deny("INVALID_REQUEST", "只能选择景点描述、开始时间或真实地点字段。")
+        deny("INVALID_REQUEST", "只能选择景点描述、开始时间或地点字段。")
     value = normalize_editor_state(session)
     registry = component_registry(value)
     selected_id = selected_component_ids[0]
@@ -93,7 +93,7 @@ def resolve_scope(session: dict, selected_component_ids: list[str], fields: list
         "allowedPaths": sorted(allowed), "lockedComponentIds": locked,
         "editableFields": chosen_fields, "eligibleActivityIds": eligible,
         "labels": [selected["label"]], "selectedLocked": selected_locked,
-        "restriction": "可修改当前选中日期、时段或景点内未锁定的描述、开始时间及真实地点；其他内容保持保护。",
+        "restriction": "可修改当前选中日期、时段或景点内未锁定的描述、开始时间及地点；其他内容保持保护。",
     }
 
 
@@ -222,7 +222,7 @@ def _assert_business_diff(before: dict, after: dict, changed_paths: list[str]) -
         permitted.add(("days", binding["dayKey"], "stops", "byId", binding["stopId"], tokens[3]))
     changes = leaf_diff(_business_projection(before), _business_projection(after))
     if any(decode_pointer(path) not in permitted for path in changes):
-        deny("PATCH_OUT_OF_SCOPE", "原业务状态的真实差异包含未授权字段。", 403)
+        deny("PATCH_OUT_OF_SCOPE", "原业务状态的实际差异包含未授权字段。", 403)
     expected_metadata = deepcopy(before["editorMetadata"])
     for path in changed_paths:
         tokens = decode_pointer(path)
@@ -277,7 +277,7 @@ def validate_patch(session: dict, selected_component_ids: list[str], patch: list
         if tokens[-1] == "startTime":
             period_for_time(operation["value"])
         if tokens[-1] == "placeId" and operation["value"] not in catalog:
-            deny("SCHEMA_INVALID", "请选择当前行程真实地点目录中的景点，不能使用虚构地点ID。")
+            deny("SCHEMA_INVALID", "请选择当前行程地点目录中的景点，不能使用虚构地点ID。")
         parent = _get(draft, tokens[:-1])
         parent[tokens[-1]] = operation["value"]
     direct_changes = leaf_diff(current, draft)
@@ -302,7 +302,7 @@ def validate_patch(session: dict, selected_component_ids: list[str], patch: list
         if any(path.endswith("/placeId") and decode_pointer(path)[2] in day["activityIds"] for path in direct_changes):
             places = [draft["entities"]["activities"][aid]["placeId"] for aid in day["activityIds"]]
             if len(places) != len(set(places)):
-                deny("INVARIANT_VIOLATION", "同一天不能重复安排同一个真实景点，请选择其他备选。")
+                deny("INVARIANT_VIOLATION", "同一天不能重复安排同一个景点，请选择其他备选。")
     validate_document_schema(draft)
     validate_invariants(draft, value["persistedConstraints"])
     changes = leaf_diff(current, draft)
@@ -310,7 +310,7 @@ def validate_patch(session: dict, selected_component_ids: list[str], patch: list
         deny("NO_CHANGE", "补丁没有实际改变授权字段。")
     derived = [path for path in changes if path not in direct_changes]
     if any(decode_pointer(path) not in authorised for path in direct_changes):
-        deny("PATCH_OUT_OF_SCOPE", "真实状态差异包含未授权字段。", 403)
+        deny("PATCH_OUT_OF_SCOPE", "实际状态差异包含未授权字段。", 403)
     for field in ("schemaVersion", "tripId", "version", "dayOrder"):
         if current[field] != draft[field]:
             deny("PATCH_OUT_OF_SCOPE", "内部元数据不能由业务补丁更改。", 403)

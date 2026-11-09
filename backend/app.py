@@ -15,6 +15,7 @@ from pathlib import Path
 import re
 import threading
 from typing import Any, Literal
+from urllib.parse import urlsplit
 from uuid import uuid4
 
 from fastapi import FastAPI, HTTPException, Request
@@ -27,11 +28,11 @@ from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt
 
 from . import agent
 from .trip_document import normalize_editor_state, to_trip_document, component_registry, validate_locked_unchanged, activity_id, period_for_time
-from .domain import region_map, session_catalog
+from .domain import curated_catalog_needs_upgrade, region_map, session_catalog
 from .trip_setup import TripSetupRequest, build_trip_payload
 from .template_transfer import DISPLAY_FIELDS, parse_style_transfer, transfer_scope, copy_style_updates
 from . import scope as editing_scope
-from .config import get_settings
+from .config import get_settings, normalize_llm_base_url, runtime_values, update_runtime_values
 from .maps import enrich_day, static_map_image
 from .persistence import Store
 from .access import install_access
@@ -102,7 +103,11 @@ def initial_payload() -> dict[str, Any]:
 
 def normalize_session(session: dict) -> dict:
     result = deepcopy(session)
-    if not result.get("catalog") and result.get("catalogVersion") != CATALOG_VERSION:
+    if curated_catalog_needs_upgrade(result):
+        result["catalog"] = session_catalog(result)
+        result["catalogVersion"] = CATALOG_VERSION
+        result["routeData"] = {}
+    elif not result.get("catalog") and result.get("catalogVersion") != CATALOG_VERSION:
         result["routeData"] = {}
     if not result.get("catalog"):
         result["catalogVersion"] = CATALOG_VERSION
@@ -134,7 +139,8 @@ def costs(trip: dict, catalog: dict | None = None) -> dict:
     places = [places_by_id[stop["placeId"]] for day in trip["days"].values() for stop in day["stops"]]
     travelers = trip.get("travelers", 1)
     room_count = trip.get("roomCount", (travelers + 1) // 2)
-    result = {"attractions": sum(p["cost"] for p in places) * travelers, "transport": sum(p["transportCost"] for p in places) * travelers, "food": 120 * len(trip["days"]) * travelers, "hotel": hotels_by_id[trip["hotelId"]]["nightlyPrice"] * trip["nights"] * room_count}
+    food_per_day = data.get("pricing", {}).get("foodPerPersonDay", 180)
+    result = {"attractions": sum(p["cost"] for p in places) * travelers, "transport": sum(p["transportCost"] for p in places) * travelers, "food": food_per_day * len(trip["days"]) * travelers, "hotel": hotels_by_id[trip["hotelId"]]["nightlyPrice"] * trip["nights"] * room_count}
     result["total"] = sum(result.values())
     result["remaining"] = round(trip["budgetLimit"] - result["total"], 2)
     return result
@@ -184,6 +190,17 @@ class GenerateBody(Versioned):
 
 class RoutesBody(Versioned):
     targetRegionId: agent.Region | Literal["all"]
+
+
+class ModelIntegrationBody(BaseModel):
+    apiKey: str | None = Field(default=None, max_length=4096, repr=False)
+    baseUrl: str = Field(min_length=1, max_length=2048)
+    model: str | None = Field(default=None, max_length=200)
+
+
+class MapIntegrationBody(BaseModel):
+    apiKey: str | None = Field(default=None, max_length=4096, repr=False)
+    baseUrl: str = Field(default="https://restapi.amap.com", min_length=1, max_length=2048)
 
 
 class ApplyBody(Versioned):
@@ -308,7 +325,7 @@ def build_demo_proposal(session: dict, body: GenerateBody) -> dict:
     ui = deepcopy(session["uiSpec"]["regions"][target])
     day = deepcopy(session["tripState"]["days"][regions[target]])
     changes = []
-    warnings = ["当前为规则演示模式，仅支持页面列出的指令；未调用真实大模型。"]
+    warnings = ["当前为规则演示模式，仅支持页面列出的指令；未调用模型。"]
     recognized = False
     modifications = False
 
@@ -378,7 +395,7 @@ def build_demo_proposal(session: dict, body: GenerateBody) -> dict:
             if not places_by_id[stop["placeId"]]["indoor"]:
                 replacement = next((pid for pid in replacements if pid not in used), None)
                 if replacement is None:
-                    raise HTTPException(400, "当前真实目录内的室内备选不足，请保留部分景点或缩小修改范围。")
+                    raise HTTPException(400, "当前目录内的室内备选不足，请保留部分景点或缩小修改范围。")
                 used.add(replacement)
                 old_name = places_by_id[stop["placeId"]]["name"]
                 stop["placeId"] = replacement
@@ -461,7 +478,7 @@ def _plan_updates(session: dict, body: GenerateBody, scope: agent.EditScope, pla
             fields = operation.model_dump(exclude_none=True, exclude={"kind", "regionId"})
             day.update(fields)
             if any(stop["placeId"] not in places_by_id for stop in day["stops"]):
-                raise HTTPException(400, "行程修改使用了尚未核实的景点，请从真实地点目录选择。")
+                raise HTTPException(400, "行程修改使用了尚未核实的景点，请从地点目录选择。")
             if len({stop["id"] for stop in day["stops"]}) != len(day["stops"]):
                 raise HTTPException(400, "景点条目标识不能重复。")
             other_ids = {stop["id"] for key, other in session["tripState"]["days"].items() if key != regions[target] for stop in other["stops"]}
@@ -527,7 +544,7 @@ def _demo_batch(session: dict, body: GenerateBody, requested: set[str]) -> tuple
                 operations.append(agent.ReplaceStop(kind="replace_stop", regionId=target, stopId=old["id"], placeId=new["placeId"]))
         permissions.append(permission)
     scope = editing_scope.freeze_scope(session, agent.EditScope(message="按演示指令限定修改范围", permissions=permissions), body.instruction, body.targetRegionId)
-    first = agent.CandidatePlan(title="按当前要求调整", rationale="仅执行演示指令涉及的修改。", message="已生成规则演示方案；未调用真实模型。", scope="all_days" if len(requested) == 3 else "selected", operations=operations)
+    first = agent.CandidatePlan(title="按当前要求调整", rationale="仅执行演示指令涉及的修改。", message="已生成规则演示方案；未调用模型。", scope="all_days" if len(requested) == 3 else "selected", operations=operations)
     plans = [first]
     if any("showMap" in permission.uiFields and permission.requiredUI.showMap is True for permission in scope.permissions):
         above = first.model_copy(deep=True)
@@ -544,7 +561,7 @@ def _demo_batch(session: dict, body: GenerateBody, requested: set[str]) -> tuple
             if isinstance(operation, agent.SetUI) and operation.showTransport is True:
                 operation.transportStyle = "summary"
         plans.append(summary)
-    return scope, agent.CandidateBatch(message="规则演示候选，未调用真实大模型。", candidates=plans[:3])
+    return scope, agent.CandidateBatch(message="规则演示候选，未调用模型。", candidates=plans[:3])
 
 
 def _candidate_fingerprint(session: dict, updates: list[dict], trip_changes: dict | None = None) -> str:
@@ -670,7 +687,7 @@ def build_proposal(session: dict, body: GenerateBody, frozen_scope: agent.EditSc
     scope_summary = editing_scope.scope_summary(scope)
     batch_id = uuid4().hex
     for index, (plan, updates, query_targets, trip_changes) in enumerate(valid):
-        warnings = ["当前为规则演示模式，未调用真实大模型。"] if settings.agent_mode == "demo" else []
+        warnings = ["当前为规则演示模式，未调用模型。"] if settings.agent_mode == "demo" else []
         warnings.extend(scope.warnings)
         warnings.extend(plan.warnings)
         changes = editing_scope.describe_changes(session, updates, places_by_id) + describe_trip_changes(session, trip_changes)
@@ -725,23 +742,38 @@ def health(request: Request):
 
 @app.get("/api/catalog")
 def catalog():
-    return {"places": PLACES, "hotels": HOTELS, "version": CATALOG_VERSION}
+    return session_catalog()
 
 
 class LegacySessionBody(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
-@app.post("/api/sessions")
-def create_session(request: Request, body: TripSetupRequest | LegacySessionBody | None = None):
-    payload = build_trip_payload(body) if isinstance(body, TripSetupRequest) else initial_payload()
+def _create_session(request: Request, payload: dict) -> dict:
     session = {"id": uuid4().hex, "version": 1, **payload, "history": [], "_undo": [], "_owner": request.state.visitor_owner, "_initialPayload": deepcopy(payload)}
     session = normalize_session(session)
     count = len(payload["tripState"]["days"])
-    audit(session, f"创建{payload['tripState']['city']}{count}日行程（真实地点，费用为预算估算）", "create")
+    audit(session, f"创建{payload['tripState']['city']}{count}日行程（费用为预算估算）", "create")
     with store.lock:
         store.save(session)
     return public(session)
+
+
+@app.post("/api/sessions")
+def create_session(request: Request, body: TripSetupRequest | LegacySessionBody | None = None):
+    payload = build_trip_payload(body) if isinstance(body, TripSetupRequest) else initial_payload()
+    return _create_session(request, payload)
+
+
+@app.post("/api/demo-sessions")
+def create_demo_session(request: Request, body: TripSetupRequest):
+    """Generate a real-catalog Hangzhou example from the supplied conditions.
+
+    The endpoint is explicitly model-free even when the main planner is
+    configured for an LLM. It exists for a runnable GenUI demonstration, not a
+    fixed fixture; the normal session ownership and version rules still apply.
+    """
+    return _create_session(request, build_trip_payload(body, force_demo=True))
 
 
 @app.get("/api/sessions/{session_id}")
@@ -769,6 +801,92 @@ def route_map(session_id: str, region: str, v: int):
 def agent_status():
     settings = get_settings()
     return {**agent.status(), "capabilities": ["personalized-trip-planning", "session-local-city-catalog", "trusted-presentation", "map", "catalog-replacement", "time", "day-note", "component-selection", "persistent-component-locks", "fixed-restricted-patch", "validated-patch-candidates", "isolated-candidate-preview", "server-owned-candidate-commit"], "editingMode": "phase2-restricted-candidates", "runtimeCodeExecution": False, "phase": "Phase 4", "candidateAgentMode": settings.candidate_agent_mode, "candidateLlmConfigured": bool(settings.llm_api_key and settings.llm_model)}
+
+
+def _require_local_integration_request(request: Request) -> None:
+    client = request.client.host if request.client else ""
+    host = request.url.hostname or ""
+    local_client = client in {"127.0.0.1", "::1", "testclient"}
+    local_host = host in {"127.0.0.1", "localhost", "::1", "testserver"}
+    if not (local_client and local_host):
+        raise HTTPException(403, "服务接入设置仅允许在本机页面操作。")
+
+
+def _integration_status() -> dict:
+    settings = get_settings()
+    overrides = runtime_values()
+    return {
+        "model": {
+            "configured": bool(settings.llm_api_key and settings.llm_model),
+            "baseUrl": settings.llm_base_url,
+            "model": settings.llm_model,
+            "provider": urlsplit(settings.llm_base_url).hostname or "",
+            "runtimeOverride": any(key in overrides for key in ("LLM_API_KEY", "LLM_BASE_URL", "LLM_MODEL")),
+        },
+        "amap": {
+            "configured": bool(settings.amap_key),
+            "baseUrl": "https://restapi.amap.com",
+            "runtimeOverride": "AMAP_KEY" in overrides,
+        },
+    }
+
+
+def _clean_integration_secret(value: str | None, current: str, label: str) -> str:
+    if value is None or not value.strip():
+        if current:
+            return current
+        raise HTTPException(400, f"请填写{label}。")
+    cleaned = value.strip()
+    if any(ord(character) < 33 or ord(character) == 127 for character in cleaned):
+        raise HTTPException(400, f"{label}格式不正确。")
+    return cleaned
+
+
+@app.get("/api/integrations")
+def integrations(request: Request):
+    _require_local_integration_request(request)
+    return _integration_status()
+
+
+@app.put("/api/integrations/model")
+def configure_model_integration(request: Request, body: ModelIntegrationBody):
+    _require_local_integration_request(request)
+    current = get_settings()
+    try:
+        base_url = normalize_llm_base_url(body.baseUrl)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from None
+    model = (body.model or current.llm_model).strip()
+    if not model or len(model) > 200 or any(ord(character) < 33 for character in model):
+        raise HTTPException(400, "请填写有效的模型 ID。")
+    api_key = _clean_integration_secret(body.apiKey, current.llm_api_key, "模型 API Key")
+    update_runtime_values({"LLM_API_KEY": api_key, "LLM_BASE_URL": base_url, "LLM_MODEL": model,
+                           "LLM_MODEL_LABEL": model, "AGENT_MODE": "llm", "CANDIDATE_AGENT_MODE": "llm"})
+    return _integration_status()
+
+
+@app.delete("/api/integrations/model")
+def clear_model_integration(request: Request):
+    _require_local_integration_request(request)
+    update_runtime_values({"LLM_API_KEY": "", "AGENT_MODE": "demo", "CANDIDATE_AGENT_MODE": "mock"})
+    return _integration_status()
+
+
+@app.put("/api/integrations/amap")
+def configure_amap_integration(request: Request, body: MapIntegrationBody):
+    _require_local_integration_request(request)
+    if body.baseUrl.strip().rstrip("/") != "https://restapi.amap.com":
+        raise HTTPException(400, "高德 Web 服务请求地址固定为 https://restapi.amap.com。")
+    api_key = _clean_integration_secret(body.apiKey, get_settings().amap_key, "高德 Web 服务 Key")
+    update_runtime_values({"AMAP_KEY": api_key})
+    return _integration_status()
+
+
+@app.delete("/api/integrations/amap")
+def clear_amap_integration(request: Request):
+    _require_local_integration_request(request)
+    update_runtime_values({"AMAP_KEY": ""})
+    return _integration_status()
 
 
 @app.post("/api/sessions/{session_id}/generate")
@@ -827,7 +945,7 @@ class CopyStyleBody(Versioned):
 def build_style_transfer(session: dict, body: GenerateBody, source: str, targets: list[str]) -> dict:
     frozen = transfer_scope(session, source, targets)
     if body.generateCandidates is True:
-        raise HTTPException(400, "复用同一页面样式是确定的修改，请取消勾选“是否生成候选”，或使用“复用当前页面样式”按钮预览。")
+        raise HTTPException(400, "复用同一页面样式属于确定性修改，不能同时要求多个候选；请关闭候选生成后重试。")
     try:
         updates = copy_style_updates(session, source, targets)
     except HTTPException as exc:

@@ -26,7 +26,7 @@ def evaluate(checked, patch, instruction):
             "evidence":["Schema、锁、范围、时间不变量及实际Diff均通过，功能保真此处仅指这些结构检查。",
                         "语义匹配为关键词与实际字段的规则代理，无法证明自然语言目标完整满足。",
                         f"直接改动比例 {cost:.3f}；最大时间调整 {time_delta} 分钟；休息描述匹配 {rest}。",
-                        "可用性为显式启发式，未进行用户实验或真实路线优化。"]}
+                        "可用性为显式启发式，未进行用户实验或路线优化。"]}
 
 def diversity(left, right):
     a={p["path"] for p in left["patch"]};b={p["path"] for p in right["patch"]}

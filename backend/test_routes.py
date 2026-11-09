@@ -134,7 +134,12 @@ class RouteRefreshTests(unittest.TestCase):
         old_snapshot = module.payload_of(current)
         old_snapshot.pop("catalogVersion")
         old_snapshot["routeData"] = {"day-2": {"status": "ready", "points": [{"name": "虚构旧地点"}]}}
-        current.pop("catalogVersion")
+        legacy_catalog = deepcopy(self.session["catalog"])
+        legacy_catalog["version"] = "hangzhou-curated-20261106"
+        legacy_catalog["places"] = legacy_catalog["places"][:15]
+        legacy_catalog["hotels"] = legacy_catalog["hotels"][:3]
+        current["catalog"] = legacy_catalog
+        current["catalogVersion"] = legacy_catalog["version"]
         current["routeData"] = deepcopy(old_snapshot["routeData"])
         current["_undo"] = [old_snapshot]
         current["version"] += 1
@@ -142,6 +147,8 @@ class RouteRefreshTests(unittest.TestCase):
         self.session = self.client.get(self.url).json()
         self.assertEqual(self.session["routeData"], {})
         self.assertEqual(self.session["catalogVersion"], module.CATALOG_VERSION)
+        self.assertEqual(len(self.session["catalog"]["places"]), 27)
+        self.assertEqual(len(self.session["catalog"]["hotels"]), 12)
         trip = deepcopy(self.session["tripState"])
         self.request("/undo", {})
         self.assertEqual(self.session["routeData"], {})

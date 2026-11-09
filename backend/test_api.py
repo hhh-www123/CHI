@@ -11,6 +11,7 @@ from jsonschema import ValidationError
 
 from backend import access
 from backend import app as module
+from backend import trip_setup
 from backend.config import Settings
 
 
@@ -60,6 +61,20 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(self.session["tripState"], before["tripState"])
         self.assertEqual(self.session["uiSpec"]["regions"]["day-1"], before["uiSpec"]["regions"]["day-1"])
         self.assertEqual(self.session["uiSpec"]["regions"]["day-2"]["view"], "timeline")
+
+    def test_demo_endpoint_generates_from_submitted_conditions_instead_of_fixed_fixture(self):
+        body = {"city": "杭州", "dayCount": 3, "budgetLimit": 12000, "startDate": "2026-12-12", "travelers": 2,
+                "preferences": "喜欢历史博物馆，时间表紧凑，自驾"}
+        with patch.object(trip_setup, "get_settings", return_value=self.settings):
+            response = self.client.post("/api/demo-sessions", json=body)
+        self.assertEqual(response.status_code, 200, response.text)
+        generated = response.json()
+        self.assertEqual(generated["planningSettings"]["generationMode"], "deterministic-demo")
+        self.assertEqual(generated["planningSettings"]["preferences"], body["preferences"])
+        self.assertEqual(generated["tripState"]["travelers"], 2)
+        self.assertEqual(generated["tripState"]["days"]["day1"]["date"], "2026-12-12")
+        self.assertTrue(all(region["view"] == "timeline" and region["transportMode"] == "driving" for region in generated["uiSpec"]["regions"].values()))
+        self.assertNotEqual(generated["tripState"]["days"], self.session["tripState"]["days"])
 
     def test_rain_preserves_stop_ids_times_notes_and_other_days(self):
         self.mutate("/direct", {"kind": "note", "targetRegionId": "day-2", "value": "已订午餐"}, "patch")

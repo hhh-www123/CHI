@@ -27,6 +27,18 @@ class DomainTests(unittest.TestCase):
         self.assertEqual(snapshot["catalog"]["places"][0]["id"], "local")
         self.assertEqual(session_catalog()["city"], "杭州")
 
+    def test_previous_hangzhou_catalog_is_upgraded_but_custom_catalog_is_not(self):
+        legacy = deepcopy(session_catalog())
+        legacy["version"] = "hangzhou-curated-20261106"
+        legacy["places"] = legacy["places"][:15]
+        legacy["hotels"] = legacy["hotels"][:3]
+        upgraded = session_catalog({"tripState": {"city": "杭州"}, "catalogVersion": legacy["version"], "catalog": legacy})
+        self.assertEqual(upgraded["version"], session_catalog()["version"])
+        self.assertEqual(len(upgraded["places"]), 27)
+        self.assertEqual(len(upgraded["hotels"]), 12)
+        custom = {"places": [{"id": "local"}], "hotels": [{"id": "stay"}], "version": "custom"}
+        self.assertEqual(session_catalog({"tripState": {"city": "杭州"}, "catalog": custom}), custom)
+
     def test_agent_region_schema_supports_only_bounded_dynamic_ids(self):
         self.assertEqual(agent.SetUI(kind="set_ui", regionId="day-14", view="timeline").regionId, "day-14")
         for region in ("day-0", "day-15", "day-01", "other"):
@@ -82,7 +94,7 @@ class TripSetupTests(unittest.TestCase):
     def test_hangzhou_fallback_uses_existing_verified_catalog(self):
         catalog = setup.discover_catalog(self.body())
         self.assertEqual(catalog["places"], session_catalog()["places"])
-        self.assertTrue(catalog["warnings"])
+        self.assertEqual(catalog["warnings"], [])
         self.request_mock.assert_not_called()
 
     def test_demo_fourteen_days_has_stable_ids_real_places_and_consecutive_dates(self):
@@ -112,6 +124,28 @@ class TripSetupTests(unittest.TestCase):
         self.assertEqual(len(payload["tripState"]["days"]), 1)
         self.assertTrue(any("超过总预算" in warning for warning in payload["planningSettings"]["warnings"]))
         self.assertEqual(payload["routeData"], {})
+
+    def test_offline_genui_uses_actual_preferences_budget_and_presentation(self):
+        self.settings = Settings(agent_mode="demo")
+        relaxed = setup.build_trip_payload(self.body(preferences="喜欢茶文化和自然，节奏轻松", budgetLimit=3000))
+        dense = setup.build_trip_payload(self.body(preferences="喜欢历史博物馆，时间表紧凑，自驾", budgetLimit=12000))
+        relaxed_ids = [stop["placeId"] for day in relaxed["tripState"]["days"].values() for stop in day["stops"]]
+        dense_ids = [stop["placeId"] for day in dense["tripState"]["days"].values() for stop in day["stops"]]
+        self.assertNotEqual(relaxed_ids, dense_ids)
+        self.assertTrue(all(len(day["stops"]) == 2 for day in relaxed["tripState"]["days"].values()))
+        self.assertTrue(all(len(day["stops"]) == 3 for day in dense["tripState"]["days"].values()))
+        self.assertTrue(all(region["view"] == "timeline" and region["transportMode"] == "driving" for region in dense["uiSpec"]["regions"].values()))
+        self.assertEqual(relaxed["planningSettings"]["generationMode"], "deterministic-demo")
+        self.assertIn("偏好", relaxed["planningSettings"]["generationBasis"])
+        self.assertNotEqual(relaxed["tripState"]["hotelId"], dense["tripState"]["hotelId"])
+
+    def test_explicit_demo_generation_never_calls_configured_model_or_map(self):
+        self.settings = Settings(agent_mode="llm", llm_api_key="configured", amap_key="configured-map")
+        with patch.object(agent, "_request_model", side_effect=AssertionError("explicit demo must remain model-free")):
+            payload = setup.build_trip_payload(self.body(preferences="雨天室内备选"), force_demo=True)
+        self.assertEqual(payload["planningSettings"]["generationMode"], "deterministic-demo")
+        self.assertTrue(all(region["showAlternatives"] for region in payload["uiSpec"]["regions"].values()))
+        self.request_mock.assert_not_called()
 
     def test_real_model_planning_receives_preferences_and_only_verified_ids(self):
         body = self.body(dayCount=5, travelers=4, preferences="喜欢文化场馆，慢节奏")
