@@ -1,4 +1,5 @@
 import type { ComponentBinding, PersistedConstraints, TripDocument } from './features/agentic-editor/types';
+import type { Requirement, RequirementReview } from './features/agentic-editor/governanceTypes';
 export type DayKey = `day${number}`;
 export type RegionId = `day-${number}`;
 export type ViewType = 'cards' | 'timeline';
@@ -190,6 +191,8 @@ export interface PlanningSettings extends TripSetupRequest {
   generationBasis?: string[];
 }
 export interface Session {
+  requirements?: Requirement[];
+  requirementReviews?: RequirementReview[];
   tripDocument?: TripDocument;
   componentRegistry?: Record<string, ComponentBinding>;
   persistedConstraints?: PersistedConstraints;

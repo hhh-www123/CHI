@@ -28,7 +28,8 @@ from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt
 
 from . import agent
 from .trip_document import normalize_editor_state, to_trip_document, component_registry, validate_locked_unchanged, activity_id, period_for_time
-from .domain import curated_catalog_needs_upgrade, region_map, session_catalog
+from .domain import curated_catalog_needs_upgrade, region_map, session_catalog, trip_costs as costs
+from .requirements import validate_requirements
 from .trip_setup import TripSetupRequest, build_trip_payload
 from .template_transfer import DISPLAY_FIELDS, parse_style_transfer, transfer_scope, copy_style_updates
 from . import scope as editing_scope
@@ -103,6 +104,8 @@ def initial_payload() -> dict[str, Any]:
 
 def normalize_session(session: dict) -> dict:
     result = deepcopy(session)
+    result.setdefault('requirements', [])
+    result.setdefault('requirementReviews', [])
     if curated_catalog_needs_upgrade(result):
         result["catalog"] = session_catalog(result)
         result["catalogVersion"] = CATALOG_VERSION
@@ -122,7 +125,7 @@ def normalize_session(session: dict) -> dict:
 
 def payload_of(session: dict) -> dict:
     normalized = normalize_session(session)
-    keys = ("tripState", "uiSpec", "controlState", "routeData", "catalogVersion", "catalog", "planningSettings", "planningWarnings", "editorMetadata", "persistedConstraints", "editorAudit", "presentationSettings")
+    keys = ("tripState", "uiSpec", "controlState", "routeData", "catalogVersion", "catalog", "planningSettings", "planningWarnings", "editorMetadata", "persistedConstraints", "editorAudit", "presentationSettings", 'requirements', 'requirementReviews')
     return deepcopy({key: normalized[key] for key in keys if key in normalized})
 
 
@@ -130,20 +133,6 @@ def _session_context(session: dict):
     catalog = session_catalog(session)
     places = catalog["places"]
     return region_map(session), places, {place["id"]: place for place in places}, {hotel["id"]: hotel for hotel in catalog["hotels"]}
-
-
-def costs(trip: dict, catalog: dict | None = None) -> dict:
-    data = catalog or {"places": PLACES, "hotels": HOTELS}
-    places_by_id = {place["id"]: place for place in data["places"]}
-    hotels_by_id = {hotel["id"]: hotel for hotel in data["hotels"]}
-    places = [places_by_id[stop["placeId"]] for day in trip["days"].values() for stop in day["stops"]]
-    travelers = trip.get("travelers", 1)
-    room_count = trip.get("roomCount", (travelers + 1) // 2)
-    food_per_day = data.get("pricing", {}).get("foodPerPersonDay", 180)
-    result = {"attractions": sum(p["cost"] for p in places) * travelers, "transport": sum(p["transportCost"] for p in places) * travelers, "food": food_per_day * len(trip["days"]) * travelers, "hotel": hotels_by_id[trip["hotelId"]]["nightlyPrice"] * trip["nights"] * room_count}
-    result["total"] = sum(result.values())
-    result["remaining"] = round(trip["budgetLimit"] - result["total"], 2)
-    return result
 
 
 def public(session: dict) -> dict:
@@ -267,6 +256,10 @@ def commit(session: dict, candidate: dict, summary: str, kind: str, *, operation
             projected.pop(key, None)
     projected.update(candidate)
     after = normalize_session(projected)
+    if kind not in {'requirement_change', 'requirement_review', 'history_restore', 'reset'}:
+        if session['requirements'] != after['requirements'] or session['requirementReviews'] != after['requirementReviews']:
+            raise HTTPException(403, '持续需求及人工核验记录只能通过明确的需求管理操作修改。')
+    validate_requirements(after if kind in {'history_restore', 'reset'} else session, after)
     if kind not in explicit_constraints:
         validate_locked_unchanged(session, after)
         if session["controlState"] != after["controlState"]:
@@ -1237,6 +1230,8 @@ from .candidate_api import install_candidate_api
 install_candidate_api(app, sys.modules[__name__])
 from .history_api import install_history_api
 install_history_api(app, sys.modules[__name__])
+from .governance_api import install_governance_api
+install_governance_api(app, sys.modules[__name__])
 
 # A built frontend shares the local API origin, so the demo needs only one server.
 # Keep this mount after all API routes; Vite remains available for development.

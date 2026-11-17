@@ -5,6 +5,7 @@ import { api } from '../../api';
 import { StopCardContent } from '../../components/StopCardContent';
 import type { Catalog, Session, TripStop } from '../../types';
 import type { CandidateAgentMode, CandidateAgentStatus, CandidateBatch, CandidateStrategy, EditCandidate } from './candidateTypes';
+import { GroupedCandidateDifferences, type CandidateVisualization } from './ChangeScope';
 import type { EditorField, EditorScope } from './types';
 
 const STRATEGIES: Record<CandidateStrategy, { letter: string; label: string }> = {
@@ -38,10 +39,11 @@ function CandidatePreview({ candidate, batch, session, catalog }: { candidate: E
   </section>;
 }
 
-export function CandidatePanel({ session, catalog, selectedId, editorMode, busy, hasDrafts, onCommit, onConflict, onNeedModel, variant = 'editor' }: {
+export function CandidatePanel({ session, catalog, selectedId, editorMode, busy, hasDrafts, onCommit, onConflict, onNeedModel, onVisualize, variant = 'editor' }: {
   session: Session; catalog: Catalog; selectedId: string | null; editorMode: boolean; busy: boolean; hasDrafts: boolean;
   onCommit: (candidateId: string, baseVersion: number) => Promise<boolean>; onConflict: (error: unknown) => void;
   onNeedModel?: () => void;
+  onVisualize?: (visual: CandidateVisualization | null) => void;
   variant?: 'editor' | 'conversation';
 }) {
   const conversation = variant === 'conversation';
@@ -65,6 +67,12 @@ export function CandidatePanel({ session, catalog, selectedId, editorMode, busy,
   const binding = selectedId ? session.componentRegistry?.[selectedId] : undefined;
   const candidate = batch?.candidates.find(item => item.candidateId === candidateId);
   const fieldKey = fields.join(',');
+
+  useEffect(() => {
+    const current = !candidate || candidate.baseVersion === session.version;
+    onVisualize?.(scope && active && current ? {baseVersion: session.version, scope, candidate: candidate ?? null} : null);
+    return () => onVisualize?.(null);
+  }, [scope, candidate, active, session.version, onVisualize]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -130,13 +138,6 @@ export function CandidatePanel({ session, catalog, selectedId, editorMode, busy,
     if (ok) { discard('已保存所选方案，其他候选未被采用。'); }
     else if (epoch === generation.current) setError(`${binding?.label || '当前选区'}的候选基于 v${batch.baseVersion}，本次未保存。正式行程未被候选覆盖，请根据版本提示重新生成或重试。`);
   }
-  function differenceValue(field: keyof typeof FIELD_LABELS, value: string) {
-    if (!value) return '（空）';
-    if (field === 'placeId') return catalog.places.find(place => place.id === value)?.name || value;
-    if (field === 'period') return PERIOD_LABELS[value as keyof typeof PERIOD_LABELS] || value;
-    if (field === 'parentId') return PERIOD_LABELS[value.split('-').pop() as keyof typeof PERIOD_LABELS] ? PERIOD_LABELS[value.split('-').pop() as keyof typeof PERIOD_LABELS] + '分组' : value;
-    return value;
-  }
   function chooseFields(field: EditorField, checked: boolean) {
     discard(); setFields(current => checked ? [...current, field] : current.filter(item => item !== field));
   }
@@ -145,6 +146,7 @@ export function CandidatePanel({ session, catalog, selectedId, editorMode, busy,
     void generate();
   }
   return <section className={`phase2-editor ${conversation ? 'conversation-agent' : ''}`} data-testid={conversation ? 'browse-agent-dialog' : 'phase2-editor'} aria-label={conversation ? '向 Agent 描述行程修改' : '自然语言多策略候选编辑'}>
+    {!!session.requirements?.some(item => item.status === 'active') && <details className="candidate-requirements" data-testid="candidate-active-requirements"><summary>本轮保留的持续需求 · {session.requirements.filter(item => item.status === 'active').length}</summary><ul>{session.requirements.filter(item => item.status === 'active').map(item => <li key={item.id}>{item.text} · {item.scopeLabel}</li>)}</ul></details>}
     {conversation ? <>
       <div className="conversation-agent-heading"><span className="assistant-icon"><Sparkles size={20} /></span><div><span className="panel-eyebrow">ASK THE AGENT</span><h2>想怎么调整这一天？</h2></div><span className="assistant-status"><span className="status-dot" />{status?.llmConfigured ? '模型服务' : '待接入'}</span></div>
       <div className="conversation-context" data-testid="browse-agent-scope"><span>当前范围</span><strong>{binding?.label || '当前日期'}</strong><small>{scopePending ? '正在确认可修改内容…' : scope?.locked ? '此日期已锁定，请切到手动编辑解除锁定。' : scope?.allowedPaths.length ? `${scope.eligibleActivityIds.length} 个景点 · 时间、描述与地点` : scope?.blockedReason || '暂时没有可修改内容'}</small></div>
@@ -185,7 +187,7 @@ export function CandidatePanel({ session, catalog, selectedId, editorMode, busy,
       <h3>{candidate.label}</h3>{candidate.evaluation && <section className="candidate-evaluation" data-testid="candidate-evaluation"><strong>推荐第 {candidate.evaluation.rank} · 规则综合分 {candidate.evaluation.score.toFixed(3)}</strong><p>硬约束优先；评分是规则代理，未经用户实验验证。</p><details><summary>查看五项指标与评分依据</summary><ul>{Object.entries(candidate.evaluation.metrics).map(([key,value])=><li key={key}>{({semanticFit:'语义匹配代理',functionalFit:'结构功能校验',stability:'授权稳定性',usability:'可用性启发式',changeEconomy:'少改动程度'} as Record<string,string>)[key]||key}：{value.toFixed(3)}</li>)}</ul>{candidate.evaluation.evidence.map((text,index)=><p key={index}>{text}</p>)}</details></section>}<p className="phase2-rationale">{candidate.rationale}</p>
       <div className="phase2-validation" data-testid="phase2-validation"><ShieldCheck size={14} /><span>服务端通过：结构、范围、锁定、时间顺序、实际叶子差异与原业务差异。</span></div>
       <CandidatePreview candidate={candidate} batch={batch} session={session} catalog={catalog} />
-      <details className="phase2-differences" open><summary>查看具体差异 · {candidate.differences.length} 项</summary><ul>{candidate.differences.map(item => <li key={item.path}><strong>{item.title} · {FIELD_LABELS[item.field]}</strong><del>{differenceValue(item.field, item.before)}</del><ins>{differenceValue(item.field, item.after)}</ins>{candidate.derivedChangedPaths.includes(item.path) && <small>由地点目录或开始时间自动同步，不是额外写入权限</small>}<code>{item.path}</code></li>)}</ul></details>
+      <GroupedCandidateDifferences session={session} candidate={candidate} />
       {!!batch.rejectedCandidates.length && <div className="phase2-rejections"><strong>以下策略未纳入候选</strong>{batch.rejectedCandidates.map((item, index) => <p key={index}>{STRATEGIES[item.strategy as CandidateStrategy]?.label || item.strategy}：{item.message}</p>)}</div>}
       {batch.diagnostics.map((text, index) => <p className="phase2-mode-hint" key={index}>{text}</p>)}
       <p className="phase2-expiry">候选有效至 {new Date(candidate.expiresAt).toLocaleTimeString('zh-CN', { hour12: false })}；页面版本变化后需重新生成。</p>

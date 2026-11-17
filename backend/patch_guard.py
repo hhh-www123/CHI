@@ -12,6 +12,7 @@ import math
 import re
 
 from .domain import session_catalog
+from .requirements import validate_requirements
 from .trip_document import (
     TIME_PATTERN, component_is_locked, component_registry, deny, locked_component_ids,
     normalize_editor_state, period_for_time, to_trip_document, validate_document_schema,
@@ -318,6 +319,7 @@ def validate_patch(session: dict, selected_component_ids: list[str], patch: list
     payload = project_back(value, draft, projection_paths)
     after = {**value, **deepcopy(payload)}
     validate_locked_unchanged(value, after)
+    validate_requirements(value, after)
     legacy_changes = _assert_business_diff(value, after, projection_paths)
     # This equality additionally ensures the adapter cannot introduce hidden changes.
     if to_trip_document(after) != draft:

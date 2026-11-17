@@ -1,4 +1,5 @@
 import { readPreviewStream } from './features/agentic-editor/protocol';
+import type { FidelityReport, RequirementChange } from './features/agentic-editor/governanceTypes';
 import type { DisplayChange, VersionDiff, VersionList, VersionRecord } from './features/agentic-editor/historyTypes';
 import { parseCandidateBatch } from './features/agentic-editor/candidateSchema';
 import type { CandidateAgentMode, CandidateAgentStatus } from './features/agentic-editor/candidateTypes';
@@ -60,6 +61,9 @@ const remove = <T>(path: string, signal?: AbortSignal) => request<T>(path, { met
 const route = (id: string) => `/sessions/${encodeURIComponent(id)}`;
 
 export const api = {
+  requirements: (id: string, baseVersion: number, change: RequirementChange, signal?: AbortSignal) => post<Session>(route(id) + '/requirements', {baseVersion, ...change}, signal),
+  fidelity: (id: string, signal?: AbortSignal) => request<FidelityReport>(route(id) + '/fidelity', {signal}),
+  reviewRequirement: (id: string, baseVersion: number, targetVersion: number, requirementId: string, verdict: 'satisfied' | 'unsatisfied', note: string, signal?: AbortSignal) => post<Session>(route(id) + '/fidelity/reviews', {baseVersion, targetVersion, requirementId, verdict, note}, signal),
   versions: (id: string, signal?: AbortSignal) => request<VersionList>(route(id) + '/versions', { signal }),
   version: (id: string, version: number, signal?: AbortSignal) => request<VersionRecord>(route(id) + '/versions/' + version, { signal }),
   versionDiff: (id: string, version: number, againstVersion: number, signal?: AbortSignal) => request<VersionDiff>(route(id) + '/versions/' + version + '/diff?againstVersion=' + againstVersion, { signal }),

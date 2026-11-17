@@ -6,12 +6,15 @@ from .patch_guard import leaf_diff
 from .trip_document import normalize_editor_state, to_trip_document
 
 SNAPSHOT_KEYS = ("tripState", "uiSpec", "controlState", "routeData", "catalogVersion", "catalog",
-                 "planningSettings", "planningWarnings", "editorMetadata", "persistedConstraints", "presentationSettings")
+                 "planningSettings", "planningWarnings", "editorMetadata", "persistedConstraints", "presentationSettings",
+                 'requirements', 'requirementReviews')
 
 
 def payload_snapshot(session):
     value = normalize_editor_state(session) if "tripState" in session else deepcopy(session)
     value.setdefault("presentationSettings", {"showBudgetDetails": True})
+    value.setdefault('requirements', [])
+    value.setdefault('requirementReviews', [])
     return deepcopy({key: value[key] for key in SNAPSHOT_KEYS if key in value})
 
 
@@ -55,6 +58,7 @@ def make_record(previous, current, *, summary=None, kind=None, audit=None, resto
         before_document = snapshot_document(previous)
         before_document["version"] = document["version"]
         document_changes = leaf_diff(before_document, document)
+    from .fidelity import compute_fidelity
     return {
         "tripId": current["id"], "version": current["version"],
         "parentVersion": previous["version"] if previous else None,
@@ -74,6 +78,7 @@ def make_record(previous, current, *, summary=None, kind=None, audit=None, resto
         "validationReport": deepcopy(audit.get("validationReport", {"valid": True, "source": "trusted_user_action"})),
         "restoreFromVersion": restore_from, "legacySnapshot": legacy,
         "authorization": audit.get("authorization", "explicit_user_action"),
+        'fidelity': compute_fidelity(previous, current, kind, audit),
     }
 
 
