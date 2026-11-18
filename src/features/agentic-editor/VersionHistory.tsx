@@ -4,7 +4,7 @@ import { api } from '../../api';
 import type { Session } from '../../types';
 import type { VersionDiff, VersionSummary } from './historyTypes';
 
-const kinds: Record<string, string> = { candidate_commit: '采用候选', restricted_patch: '局部补丁', presentation: '展示调整', display: '局部样式', component_lock: '组件锁', lock: '生成锁', constraints: '约束设置', constraint_change: '约束设置', global_presentation: '全局展示', restore: '恢复快照', history_restore: '恢复快照', local_display: '局部样式', undo: '撤销', create: '初始版本', checkpoint: '接入检查点', direct: '手动编辑', reset: '重置' };
+const kinds: Record<string, string> = { candidate_commit: '采用候选', restricted_patch: '局部补丁', presentation: '展示调整', display: '局部样式', component_lock: '组件锁', lock: '生成锁', constraints: '约束设置', constraint_change: '约束设置', global_presentation: '全局展示', restore: '恢复快照', history_restore: '恢复快照', local_display: '局部样式', undo: '撤销', create: '初始版本', checkpoint: '接入检查点', direct: '手动编辑', reset: '重置', requirement_change: '需求更新', requirement_review: '人工核验' };
 const valueText = (value: unknown) => value === undefined ? '（不存在）' : typeof value === 'string' ? value || '（空）' : JSON.stringify(value);
 function ConstraintSummary({ entry }: { entry: VersionSummary }) {
   const constraints = entry.constraintsSnapshot;
@@ -71,7 +71,7 @@ export function VersionHistory({ session, busy, onRestore }: { session: Session;
     </article>)}</div>
     {!loading && !versions.length && <div className="empty-state"><History size={24} /><p>尚无可恢复的持久版本。</p></div>}
     {confirmation && <section ref={restorePanel} className="version-restore-confirm" data-testid="restore-confirm-dialog" role="alertdialog" aria-label="确认恢复保存快照">
-      <h3>恢复到 v{confirmation.targetVersion}？</h3><p>以 v{confirmation.baseVersion} 为当前版本，将全部行程、展示设置、组件锁及预算和时间约束恢复为 v{confirmation.targetVersion} 的快照，并创建 v{confirmation.baseVersion + 1}。这可能解除当前锁定或恢复旧锁；原历史不会删除。</p>
+      <h3>恢复到 v{confirmation.targetVersion}？</h3><p>以 v{confirmation.baseVersion} 为当前版本，将全部行程、展示设置、组件锁、持续需求与人工核验记录，以及预算和时间约束恢复为 v{confirmation.targetVersion} 的快照，并创建 v{confirmation.baseVersion + 1}。这可能解除当前锁定或恢复旧锁；原历史不会删除。</p>
       <label><input type="checkbox" data-testid="confirm-restore-semantics" checked={confirmed} disabled={busy || pending} onChange={event => setConfirmed(event.target.checked)} />我确认同步恢复数据、展示与全部锁定/约束。</label>
       <div className="dialog-actions"><button type="button" className="button secondary" disabled={busy || pending} onClick={() => setConfirmation(null)}>取消恢复</button><button type="button" className="button primary" data-testid="confirm-restore-version" disabled={!confirmed || busy || pending} onClick={() => void restore()}><Check size={14} />确认恢复并创建新版本</button></div>
     </section>}

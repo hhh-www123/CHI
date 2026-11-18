@@ -170,6 +170,9 @@ def install_candidate_api(app, host):
             raise HTTPException(422, {"code": "EMPTY_INSTRUCTION", "message": "请输入要在选区内修改的要求。"})
         with host.store.lock:
             snapshot = deepcopy(read(session_id, body.baseVersion))
+            snapshot['_requirementHistory'] = [
+                {'version': record['version'], 'request': record.get('userRequest', record['summary']), 'kind': record['kind']}
+                for record in reversed(host.store.versions(session_id)[:20])]
             effective = resolve_scope(snapshot, body.selectedComponentIds, body.fields)
             if effective["selectedLocked"]:
                 raise HTTPException(423, {"code": "LOCKED_COMPONENT", "message": "选区或上级组件已锁定，请先解锁或重新选择。"})
@@ -198,7 +201,9 @@ def install_candidate_api(app, host):
             current = read(session_id, body.baseVersion)
             # A versioned state must be immutable. Also guard an unexpected
             # unversioned authoritative change before caching any candidate.
-            if to_trip_document(current) != to_trip_document(snapshot) or current["persistedConstraints"] != snapshot["persistedConstraints"]:
+            if (to_trip_document(current) != to_trip_document(snapshot)
+                    or current["persistedConstraints"] != snapshot["persistedConstraints"]
+                    or current.get('requirements', []) != snapshot.get('requirements', [])):
                 raise HTTPException(409, {"code": "VERSION_CONFLICT", "message": "生成期间行程或约束已变化，请重新生成候选。"})
             if not accepted:
                 reasons = "；".join(item["message"] for item in rejected[:3])

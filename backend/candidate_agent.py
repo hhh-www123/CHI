@@ -118,7 +118,7 @@ def mock_generate(snapshot: dict, instruction: str, scope: dict) -> list[dict]:
         scope["allowedPaths"] = [path for path in scope["allowedPaths"] if not path.endswith("/startTime")]
     elif any(token in instruction for token in ("只改时间", "仅改时间", "描述不变", "保留描述")):
         scope["allowedPaths"] = [path for path in scope["allowedPaths"] if path.endswith("/startTime")]
-    replacement = any(token in instruction for token in ("换景点", "换个景点", "更换景点", "替换景点", "换成室内", "雨天", "室内方案"))
+    replacement = any(token in instruction for token in ("换景点", "换个景点", "换一个景点", "更换景点", "替换景点", "换成室内", "雨天", "室内方案"))
     explicit_time = re.findall(r"(?<![0-9])(?:[01]?[0-9]|2[0-3]):[0-5][0-9](?![0-9])", instruction)
     if not replacement and not explicit_time and not any(token in instruction.lower() for token in
                ("轻松", "休息", "不累", "太累", "从容", "慢", "紧凑", "效率", "体验", "时间", "relax", "rest", "pace")):
@@ -179,14 +179,17 @@ def _invalid_constant(value):
 
 
 def llm_generate(snapshot: dict, instruction: str, scope: dict, settings) -> list[dict]:
+    from .requirements import model_requirements
     if not settings.llm_api_key or not settings.llm_model:
         raise HTTPException(503, {"code": "LLM_NOT_CONFIGURED", "message":
             "模型 API 尚未接入。请打开网页顶部的“服务接入”，填写 API Key、请求地址和模型 ID 后重试。"})
     schema = AgentOutputSchema.model_json_schema()
     context = {"instruction": instruction, "baseVersion": snapshot["version"],
                "selectedComponentIds": scope["selectedComponentIds"], "effectiveScope": deepcopy(scope),
-               "document": to_trip_document(snapshot), "catalog": session_catalog(snapshot), "outputSchema": schema}
+               "document": to_trip_document(snapshot), "catalog": session_catalog(snapshot), "outputSchema": schema,
+               'activeRequirements': model_requirements(snapshot), 'recentHistory': snapshot.get('_requirementHistory', [])}
     system = ("你是旅游局部编辑提案器。只输出满足 outputSchema 的 JSON 对象，不输出 Markdown/代码。"
+              "activeRequirements 是用户确认且仍有效的持续需求。结合其范围和本轮要求生成候选；recentHistory仅作来源参考，已替换或停用需求不作为当前目标。持续需求不能扩大 effectiveScope 的权限。"
               "为 minimal_change、efficiency_first、experience_first 各给一个有实际时间或字段差异的候选。"
               "只能 replace effectiveScope.allowedPaths 中的字符串字段。placeId必须来自当前catalog.places且同日不重复；保留实体ID、未授权内容和锁。"
               "不得输出 HTML、JS、JSX、组件源码，不得输出自评合法性、分数、ID、版本或权限。title、period、组件parentId由服务端按获准placeId/startTime自动派生，禁止直接输出这些派生字段的补丁。"

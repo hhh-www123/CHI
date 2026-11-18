@@ -11,6 +11,23 @@ REGION_PATTERN = r"^day-(?:[1-9]|1[0-4])$"
 _DAY_KEY = re.compile(r"^day([1-9]|1[0-4])$")
 
 
+def trip_costs(trip: dict, catalog: dict | None = None) -> dict:
+    data = catalog or {"places": PLACES, "hotels": HOTELS}
+    places_by_id = {place["id"]: place for place in data["places"]}
+    hotels_by_id = {hotel["id"]: hotel for hotel in data["hotels"]}
+    places = [places_by_id[stop["placeId"]] for day in trip["days"].values() for stop in day["stops"]]
+    travelers = trip.get("travelers", 1)
+    room_count = trip.get("roomCount", (travelers + 1) // 2)
+    food_per_day = data.get("pricing", {}).get("foodPerPersonDay", 180)
+    result = {"attractions": sum(p["cost"] for p in places) * travelers,
+              "transport": sum(p["transportCost"] for p in places) * travelers,
+              "food": food_per_day * len(trip["days"]) * travelers,
+              "hotel": hotels_by_id[trip["hotelId"]]["nightlyPrice"] * trip["nights"] * room_count}
+    result["total"] = sum(result.values())
+    result["remaining"] = round(trip["budgetLimit"] - result["total"], 2)
+    return result
+
+
 def region_map(snapshot: dict | None = None) -> dict[str, str]:
     if snapshot is None:
         return {f"day-{i}": f"day{i}" for i in range(1, 4)}
